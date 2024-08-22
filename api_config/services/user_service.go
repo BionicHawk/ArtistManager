@@ -76,3 +76,50 @@ func (service *UserService) UpdateProfilePicture(userId uint, file os.File) bool
 
 	return false
 }
+
+func (service *UserService) CreateDtoOut(user *models.User) dto.UserDtoOut {
+	projectOuts := []dto.ProjectDtoOut{}
+	projectsLength := len(user.Projects)
+
+	for i := 0; i < projectsLength; i++ {
+		project := user.Projects[i]
+
+		taskOuts := []dto.TaskDtoOut{}
+		taskLength := len(project.Tasks)
+
+		for j := 0; j < taskLength; j++ {
+			task := project.Tasks[j]
+			taskOut := dto.TaskDtoOut{
+				ID:           task.ID,
+				ActivityName: task.ActivityName,
+				Description:  task.Description,
+				Status:       task.Status,
+				CreatedAt:    task.CreatedAt,
+				EndedAt:      &task.EndedAt.Time,
+			}
+
+			taskOuts = append(taskOuts, taskOut)
+		}
+
+		projectOut := dto.ProjectDtoOut{
+			ID:          project.ID,
+			Name:        project.Name,
+			Description: &project.Description.String,
+			Tasks:       taskOuts,
+			CreatedAt:   project.CreatedAt,
+			EndedAt:     &project.EndedAt.Time,
+		}
+
+		projectOuts = append(projectOuts, projectOut)
+	}
+
+	return dto.UserDtoOut{
+		ID:         user.ID,
+		Name:       user.Name,
+		ProfilePic: user.ProfilePic,
+		Email:      user.Email,
+		Projects:   projectOuts,
+		Role:       user.Role,
+		CreatedAt:  user.CreatedAt,
+	}
+}

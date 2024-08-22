@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ArtistManager/api_config/controllers"
 	"ArtistManager/api_config/models"
 	"ArtistManager/api_config/services"
 	"embed"
@@ -8,6 +9,7 @@ import (
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"gorm.io/gorm"
 )
 
 //go:embed all:frontend/dist
@@ -15,7 +17,12 @@ var assets embed.FS
 
 func main() {
 	dbContext := models.Init()
+	// Services
 	userService := services.UserService{DBContext: dbContext}
+
+	// Controllers
+	userController := controllers.UserController{UserService: &userService}
+
 	// Create an instance of the app structure
 	app := NewApp()
 
@@ -31,11 +38,15 @@ func main() {
 		OnStartup:        app.startup,
 		Bind: []interface{}{
 			app,
-			&userService,
+			&userController,
 		},
 	})
 
 	if err != nil {
 		println("Error:", err.Error())
 	}
+}
+
+func ScopeServices(database *gorm.DB) {
+
 }
