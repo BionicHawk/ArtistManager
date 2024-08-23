@@ -3,6 +3,7 @@ package services
 import (
 	"ArtistManager/api_config/models"
 	"ArtistManager/api_config/models/dto"
+	"fmt"
 	"os"
 	"path"
 
@@ -13,10 +14,19 @@ type UserService struct {
 	DBContext *gorm.DB
 }
 
-func (service *UserService) GetById(id uint) *models.User {
-	var user *models.User
+func (service *UserService) GetById(id uint) (user *models.User) {
 	service.DBContext.First(user, id)
 	return user
+}
+
+func (service *UserService) GetByEmail(emailValue string) (user *models.User) {
+	service.DBContext.First(user, "email = ?", emailValue)
+	return user
+}
+
+func (service *UserService) SearchUsersByNameTerm(name string) (users []models.User) {
+	service.DBContext.Where("name LIKE ?", fmt.Sprintf("%%%s%%", name)).Find(&users)
+	return users
 }
 
 func (service *UserService) CreateUser(userRegister *dto.UserRegister, admin bool) bool {
