@@ -134,9 +134,7 @@ func (service *UserService) CreateDtoOut(user *models.User) dto.UserDtoOut {
 	}
 }
 
-func (service *UserService) UpdateEmail(userId uint, newEmail string) bool {
-	user := service.GetById(userId)
-
+func (service *UserService) UpdateEmail(user *models.User, newEmail string) bool {
 	if user == nil {
 		return false
 	}
@@ -147,8 +145,7 @@ func (service *UserService) UpdateEmail(userId uint, newEmail string) bool {
 	return true
 }
 
-func (service *UserService) UpdatePassword(userId uint, newPassword string) bool {
-	user := service.GetById(userId)
+func (service *UserService) UpdatePassword(user *models.User, newPassword string) bool {
 
 	if user == nil {
 		return false
