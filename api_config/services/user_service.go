@@ -123,3 +123,29 @@ func (service *UserService) CreateDtoOut(user *models.User) dto.UserDtoOut {
 		CreatedAt:  user.CreatedAt,
 	}
 }
+
+func (service *UserService) UpdateEmail(userId uint, newEmail string) bool {
+	user := service.GetById(userId)
+
+	if user == nil {
+		return false
+	}
+
+	user.Email = newEmail
+
+	service.DBContext.UpdateColumn("pwd", user)
+	return true
+}
+
+func (service *UserService) UpdatePassword(userId uint, newPassword string) bool {
+	user := service.GetById(userId)
+
+	if user == nil {
+		return false
+	}
+
+	user.Pwd = newPassword
+
+	service.DBContext.UpdateColumn("pwd", user)
+	return true
+}
