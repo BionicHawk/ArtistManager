@@ -5,7 +5,6 @@ import (
 	"ArtistManager/api_config/models/dto"
 	"fmt"
 	"os"
-	"path"
 
 	"gorm.io/gorm"
 )
@@ -61,30 +60,23 @@ func (service *UserService) CreateUser(userRegister *dto.UserRegister, admin boo
 func (service *UserService) UpdateProfilePicture(userId uint, file os.File) bool {
 	var user *models.User
 
-	name := file.Name()
-	extension := path.Ext(name)
-
 	service.DBContext.First(&user, userId)
 
 	if user == nil {
 		return false
 	}
 
-	if extension == ".png" || extension == ".jpg" || extension == ".webp" {
-		data := []byte{}
-		_, err := file.Read(data)
+	data := []byte{}
+	_, err := file.Read(data)
 
-		if err != nil {
-			return false
-		}
-
-		user.ProfilePic = &data
-
-		service.DBContext.Update("profile_pic", &user)
-		return true
+	if err != nil {
+		return false
 	}
 
-	return false
+	user.ProfilePic = &data
+
+	service.DBContext.Update("profile_pic", &user)
+	return true
 }
 
 func (service *UserService) CreateDtoOut(user *models.User) dto.UserDtoOut {
@@ -145,14 +137,14 @@ func (service *UserService) UpdateEmail(user *models.User, newEmail string) bool
 	return true
 }
 
-func (service *UserService) UpdatePassword(user *models.User, newPassword string) bool {
+func (service *UserService) UpdatePassword(user *models.User, newPassword string) string {
 
 	if user == nil {
-		return false
+		return "USER_NOT_FOUND"
 	}
 
 	user.Pwd = newPassword
 
 	service.DBContext.UpdateColumn("pwd", user)
-	return true
+	return "OK"
 }

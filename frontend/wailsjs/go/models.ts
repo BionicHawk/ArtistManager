@@ -1,5 +1,19 @@
 export namespace dto {
 	
+	export class ProjectCreate {
+	    name: string;
+	    description?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ProjectCreate(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.description = source["description"];
+	    }
+	}
 	export class TaskDtoOut {
 	    id: number;
 	    activityName: string;
@@ -142,6 +156,23 @@ export namespace dto {
 	        this.name = source["name"];
 	        this.email = source["email"];
 	        this.password = source["password"];
+	    }
+	}
+
+}
+
+export namespace os {
+	
+	export class File {
+	
+	
+	    static createFrom(source: any = {}) {
+	        return new File(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	
 	    }
 	}
 

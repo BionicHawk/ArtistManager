@@ -19,9 +19,14 @@ func main() {
 	dbContext := models.Init()
 	// Services
 	userService := services.UserService{DBContext: dbContext}
+	projectService := services.ProjectService{DBContext: dbContext}
 
 	// Controllers
 	userController := controllers.UserController{UserService: &userService}
+	projectController := controllers.ProjectController{
+		ProjectService: &projectService,
+		UserService:    &userService,
+	}
 
 	// Create an instance of the app structure
 	app := NewApp()
@@ -39,6 +44,7 @@ func main() {
 		Bind: []interface{}{
 			app,
 			&userController,
+			&projectController,
 		},
 	})
 

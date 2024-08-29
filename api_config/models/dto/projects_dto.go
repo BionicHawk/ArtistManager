@@ -12,3 +12,8 @@ type ProjectDtoOut struct {
 	CreatedAt   time.Time    `json:"createdAt"`
 	EndedAt     *time.Time   `json:"endedAt"`
 }
+
+type ProjectCreate struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+}
