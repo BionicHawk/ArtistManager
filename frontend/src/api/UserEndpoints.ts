@@ -63,6 +63,19 @@ export default class UserEndpoints {
         return result;
     }
     
+    public Login(email: string, password: string): dto.UserDtoOut | null {
+        let user: dto.UserDtoOut | null = null;
+        
+        UserController.Login(email, password)
+            .then(userResult => {
+                if (userResult !== null) {
+                    user = userResult;
+                }
+            });
+
+        return user;
+    }
+
     /**
      * This function will change the password of the referenced user
      * @param userId is the user id that will reference the actual user

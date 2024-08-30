@@ -14,3 +14,5 @@ export function CreateAdmin(arg1:dto.UserRegister):Promise<boolean>;
 export function CreateUser(arg1:dto.UserRegister):Promise<boolean>;
 
 export function GetUser(arg1:number):Promise<dto.UserDtoOut>;
+
+export function Login(arg1:string,arg2:string):Promise<dto.UserDtoOut>;

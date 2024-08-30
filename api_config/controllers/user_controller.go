@@ -29,6 +29,21 @@ func (controller *UserController) GetUser(userId uint) *dto.UserDtoOut {
 	return &userOut
 }
 
+func (controller *UserController) Login(email string, password string) *dto.UserDtoOut {
+	user := controller.UserService.GetByEmail(email)
+
+	if user == nil {
+		return nil
+	}
+
+	if user.Pwd != password {
+		return nil
+	}
+
+	userOut := controller.UserService.CreateDtoOut(user)
+	return &userOut
+}
+
 func (controller *UserController) ChangeEmail(oldEmail string, newEmail string) bool {
 	userOldEmail := controller.UserService.GetByEmail(oldEmail)
 

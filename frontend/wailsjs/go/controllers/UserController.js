@@ -25,3 +25,7 @@ export function CreateUser(arg1) {
 export function GetUser(arg1) {
   return window['go']['controllers']['UserController']['GetUser'](arg1);
 }
+
+export function Login(arg1, arg2) {
+  return window['go']['controllers']['UserController']['Login'](arg1, arg2);
+}
