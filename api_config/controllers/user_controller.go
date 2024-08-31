@@ -14,8 +14,8 @@ func (controller *UserController) CreateAdmin(userRegister *dto.UserRegister) bo
 	return controller.UserService.CreateUser(userRegister, true)
 }
 
-func (controller *UserController) CreateUser(userRegister dto.UserRegister) bool {
-	return controller.UserService.CreateUser(&userRegister, false)
+func (controller *UserController) CreateUser(userRegister *dto.UserRegister) bool {
+	return controller.UserService.CreateUser(userRegister, false)
 }
 
 func (controller *UserController) GetUser(userId uint) *dto.UserDtoOut {
