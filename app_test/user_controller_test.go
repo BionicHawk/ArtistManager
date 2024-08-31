@@ -2,34 +2,12 @@ package app_test
 
 import (
 	"ArtistManager/api_config/controllers"
-	"ArtistManager/api_config/models"
 	"ArtistManager/api_config/models/dto"
-	"ArtistManager/api_config/services"
-	"fmt"
-	"os"
 	"testing"
 )
 
-func generateUserController() *controllers.UserController {
-	err := os.Remove("database.db3")
-
-	if err != nil {
-		fmt.Println("No database found!")
-	}
-
-	db := models.Init()
-
-	userService := services.UserService{
-		DBContext: db,
-	}
-
-	return &controllers.UserController{
-		UserService: &userService,
-	}
-}
-
 func TestCreateAdmin(t *testing.T) {
-	controller := generateUserController()
+	controller := GenerateUserController()
 	result := createUser(controller, true)
 
 	if result == false {
@@ -38,7 +16,7 @@ func TestCreateAdmin(t *testing.T) {
 }
 
 func TestCreateAdminDuplicate(t *testing.T) {
-	controller := generateUserController()
+	controller := GenerateUserController()
 	_ = createUser(controller, true)
 	result := createUser(controller, true)
 
@@ -48,7 +26,7 @@ func TestCreateAdminDuplicate(t *testing.T) {
 }
 
 func TestGetExistingUser(t *testing.T) {
-	controller := generateUserController()
+	controller := GenerateUserController()
 
 	createUser(controller, false)
 
@@ -60,7 +38,7 @@ func TestGetExistingUser(t *testing.T) {
 }
 
 func TestGetNotExistingUser(t *testing.T) {
-	controller := generateUserController()
+	controller := GenerateUserController()
 
 	result := controller.GetUser(1)
 
@@ -70,7 +48,7 @@ func TestGetNotExistingUser(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	controller := generateUserController()
+	controller := GenerateUserController()
 
 	createUser(controller, false)
 
@@ -82,7 +60,7 @@ func TestLogin(t *testing.T) {
 }
 
 func TestLoginNoUser(t *testing.T) {
-	controller := generateUserController()
+	controller := GenerateUserController()
 
 	result := controller.Login("example@gmail.com", "Str0ngP455!")
 
@@ -93,7 +71,7 @@ func TestLoginNoUser(t *testing.T) {
 
 func TestChangeEmail(t *testing.T) {
 	newEmail := "example2@gmail.com"
-	controller := generateUserController()
+	controller := GenerateUserController()
 
 	createUser(controller, false)
 
@@ -109,7 +87,7 @@ func TestChangeEmail(t *testing.T) {
 func TestChangeEmailWithWrongEmailSource(t *testing.T) {
 	oldEmail := "example1@gmail.com"
 	newEmail := "example2@gmail.com"
-	controller := generateUserController()
+	controller := GenerateUserController()
 
 	createUser(controller, false)
 
@@ -122,7 +100,7 @@ func TestChangeEmailWithWrongEmailSource(t *testing.T) {
 
 func TestChangeSameEmail(t *testing.T) {
 	oldEmail := "example@gmail.com"
-	controller := generateUserController()
+	controller := GenerateUserController()
 
 	createUser(controller, false)
 
@@ -136,13 +114,13 @@ func TestChangeSameEmail(t *testing.T) {
 func TestChangePassword(t *testing.T) {
 	newPassword := "N3wP455w0rd!"
 
-	controller := generateUserController()
+	controller := GenerateUserController()
 	createUser(controller, false)
 
 	result := controller.ChangePassword(1, "Str0ngP455!", newPassword)
 
 	if result != "OK" {
-		t.Fatalf("Password '%s' should have been set", newPassword)
+		t.Fatalf("Password '%s' should have been set. Output = '%s'", newPassword, result)
 	}
 
 }
@@ -151,7 +129,7 @@ func TestChangePassword2NotExistingUser(t *testing.T) {
 	oldPassword := "Str0ngP455!"
 	newPassword := "N3wP455w0rd!"
 
-	controller := generateUserController()
+	controller := GenerateUserController()
 
 	result := controller.ChangePassword(1, oldPassword, newPassword)
 
@@ -164,7 +142,7 @@ func TestChangePasswordWithWrongOldPassword(t *testing.T) {
 	oldPassword := "Str0ngP455!w"
 	newPassword := "N3wP455w0rd!"
 
-	controller := generateUserController()
+	controller := GenerateUserController()
 	createUser(controller, false)
 
 	result := controller.ChangePassword(1, oldPassword, newPassword)
@@ -172,6 +150,97 @@ func TestChangePasswordWithWrongOldPassword(t *testing.T) {
 	if result != "OLD_PASSWORD_INVALID" {
 		t.Fatalf("'OLD_PASSWORD_INVALID' expected, instead it returned '%s'", result)
 	}
+}
+
+func TestChangePasswordWithSamePassword(t *testing.T) {
+	oldPassword := "Str0ngP455!"
+
+	controller := GenerateUserController()
+	createUser(controller, false)
+
+	result := controller.ChangePassword(1, oldPassword, oldPassword)
+
+	if result != "SAME_PASSWORD_INVALID" {
+		t.Fatalf("'SAME_PASSWORD_INVALID' expected as response, but received '%s' instead", result)
+	}
+}
+
+func TestSearchUsers(t *testing.T) {
+	controller := GenerateUserController()
+
+	registers := []dto.UserRegister{
+		{
+			Name:     "Example1",
+			Email:    "example@gmail.com",
+			Password: "12345678",
+		},
+		{
+			Name:     "Example2",
+			Email:    "example1@gmail.com",
+			Password: "12345678",
+		},
+		{
+			Name:     "Example3",
+			Email:    "example2@gmail.com",
+			Password: "12345678",
+		},
+		{
+			Name:     "Example4",
+			Email:    "example3@gmail.com",
+			Password: "12345678",
+		},
+	}
+
+	for i := 0; i < len(registers); i++ {
+		register := &registers[i]
+		controller.CreateUser(register)
+	}
+
+	results := controller.SearchByName("Example")
+
+	if len(results) != 4 {
+		t.Fatalf("Results doesn't contain the expected number of entities. Expected %d, got %d", 4, len(results))
+	}
+}
+
+func TestSearchUsersWithNoResults(t *testing.T) {
+	controller := GenerateUserController()
+	term := "Test"
+
+	registers := []dto.UserRegister{
+		{
+			Name:     "Example1",
+			Email:    "example@gmail.com",
+			Password: "12345678",
+		},
+		{
+			Name:     "Example2",
+			Email:    "example1@gmail.com",
+			Password: "12345678",
+		},
+		{
+			Name:     "Example3",
+			Email:    "example2@gmail.com",
+			Password: "12345678",
+		},
+		{
+			Name:     "Example4",
+			Email:    "example3@gmail.com",
+			Password: "12345678",
+		},
+	}
+
+	for i := 0; i < len(registers); i++ {
+		register := &registers[i]
+		controller.CreateUser(register)
+	}
+
+	results := controller.SearchByName(term)
+
+	if len(results) != 0 {
+		t.Fatalf("A search with term '%s', should not retrieve any entity due to the database not containing any user with a name like it. Got %d entities", term, len(results))
+	}
+
 }
 
 func createUser(controller *controllers.UserController, isAdmin bool) bool {

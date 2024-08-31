@@ -150,11 +150,6 @@ func (service *UserService) UpdateEmail(user *models.User, newEmail string) bool
 }
 
 func (service *UserService) UpdatePassword(user *models.User, newPassword string) string {
-
-	if user == nil {
-		return "USER_NOT_FOUND"
-	}
-
 	service.DBContext.Model(&user).Update("pwd", newPassword)
 	return "OK"
 }
