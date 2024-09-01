@@ -120,6 +120,57 @@ func TestMarkAsDoneProjectMarkedAsDone(t *testing.T) {
 	}
 }
 
+func TestMarkedAsDoneNoExistingProject(t *testing.T) {
+	controller := GenerateProjectController()
+	createArtist(controller)
+
+	result := controller.MaskAsDone(1, 1)
+
+	if result != "PROJECT_NOT_FOUND" {
+		t.Fatalf("Expected 'PROJECT_NOT_FOUND', got '%s'", result)
+	}
+}
+
+func TestMarkedAsDoneWithNotExistingUser(t *testing.T) {
+	controller := GenerateProjectController()
+	createArtist(controller)
+
+	controller.CreateProject(1, dto.ProjectCreate{
+		Name: "A project",
+	})
+
+	result := controller.MaskAsDone(2, 1)
+
+	if result != "USER_NOT_FOUND" {
+		t.Fatalf("Expected 'USER_NOT_FOUND', got '%s'", result)
+	}
+}
+
+func TestMarkedAsDoneWithNotOwner(t *testing.T) {
+	controller := GenerateProjectController()
+	createArtist(controller)
+
+	newArtist := dto.UserRegister{
+		Name:     "AnotherUser",
+		Email:    "anotheruser@gmail.com",
+		Password: "12345678",
+	}
+
+	controller.UserService.CreateUser(&newArtist, false)
+
+	project := dto.ProjectCreate{
+		Name: "ToyProject",
+	}
+
+	controller.CreateProject(1, project)
+
+	result := controller.MaskAsDone(2, 1)
+
+	if result != "NOT_PROJECT_OWNER" {
+		t.Fatalf("Expected 'NOT_PROJECT_OWNER', got '%s'", result)
+	}
+}
+
 func createArtist(controller *controllers.ProjectController) bool {
 	return controller.UserService.CreateUser(&dto.UserRegister{
 		Name:     "Example",
