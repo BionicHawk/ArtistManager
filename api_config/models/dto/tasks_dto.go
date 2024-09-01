@@ -10,3 +10,8 @@ type TaskDtoOut struct {
 	CreatedAt    time.Time  `json:"createdAt"`
 	EndedAt      *time.Time `json:"endedAt"`
 }
+
+type TaskCreate struct {
+	ActivityName string  `json:"activityName"`
+	Description  *string `json:"description"`
+}
