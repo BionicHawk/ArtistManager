@@ -5,3 +5,11 @@
 export function CreateProject(arg1, arg2) {
   return window['go']['controllers']['ProjectController']['CreateProject'](arg1, arg2);
 }
+
+export function GetProjectsBySearchName(arg1) {
+  return window['go']['controllers']['ProjectController']['GetProjectsBySearchName'](arg1);
+}
+
+export function MaskAsDone(arg1, arg2) {
+  return window['go']['controllers']['ProjectController']['MaskAsDone'](arg1, arg2);
+}

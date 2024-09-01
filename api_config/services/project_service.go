@@ -16,6 +16,11 @@ type ProjectService struct {
 
 func (service *ProjectService) GetById(projectId uint) (project *models.Project) {
 	service.DBContext.First(&project, "id = ?", projectId)
+
+	if project.ID == 0 {
+		return nil
+	}
+
 	return project
 }
 
