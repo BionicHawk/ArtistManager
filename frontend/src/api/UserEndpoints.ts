@@ -10,7 +10,7 @@ export default class UserEndpoints {
     /**
      * This function creates a new Admin `User` into the database
      * @param userRegister The data needed to create a new Admin User
-     * @returns A container which will held an error if present
+     * @returns A `CreateUserResult` which will let you handle Ok and Error responses
      */
     public CreateAdmin(userRegister: dto.UserRegister): CreateUserResult {
         let result = CreateUserResult.OK;
