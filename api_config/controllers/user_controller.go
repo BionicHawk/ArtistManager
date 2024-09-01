@@ -14,8 +14,8 @@ func (controller *UserController) CreateAdmin(userRegister *dto.UserRegister) bo
 	return controller.UserService.CreateUser(userRegister, true)
 }
 
-func (controller *UserController) CreateUser(userRegister dto.UserRegister) bool {
-	return controller.UserService.CreateUser(&userRegister, false)
+func (controller *UserController) CreateUser(userRegister *dto.UserRegister) bool {
+	return controller.UserService.CreateUser(userRegister, false)
 }
 
 func (controller *UserController) GetUser(userId uint) *dto.UserDtoOut {
@@ -65,9 +65,27 @@ func (controller *UserController) ChangePassword(userId uint, oldPassword string
 		return "OLD_PASSWORD_INVALID"
 	}
 
+	if user.Pwd == newPassword {
+		return "SAME_PASSWORD_INVALID"
+	}
+
 	return controller.UserService.UpdatePassword(user, newPassword)
 }
 
 func (controller *UserController) ChangeProfilePic(userId uint, image os.File) bool {
 	return controller.UserService.UpdateProfilePicture(userId, image)
+}
+
+func (controller *UserController) SearchByName(nameTerm string) []dto.UserDtoOut {
+	var results = controller.UserService.SearchUsersByNameTerm(nameTerm)
+	userOuts := []dto.UserDtoOut{}
+
+	for i := 0; i < len(results); i++ {
+		user := &results[i]
+		out := controller.UserService.CreateDtoOut(user)
+
+		userOuts = append(userOuts, out)
+	}
+
+	return userOuts
 }

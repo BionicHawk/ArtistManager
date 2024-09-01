@@ -29,3 +29,7 @@ export function GetUser(arg1) {
 export function Login(arg1, arg2) {
   return window['go']['controllers']['UserController']['Login'](arg1, arg2);
 }
+
+export function SearchByName(arg1) {
+  return window['go']['controllers']['UserController']['SearchByName'](arg1);
+}

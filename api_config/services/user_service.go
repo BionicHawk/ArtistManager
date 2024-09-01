@@ -14,12 +14,22 @@ type UserService struct {
 }
 
 func (service *UserService) GetById(id uint) (user *models.User) {
-	service.DBContext.First(user, id)
+	service.DBContext.First(&user, id)
+
+	if user.ID == 0 {
+		return nil
+	}
+
 	return user
 }
 
 func (service *UserService) GetByEmail(emailValue string) (user *models.User) {
-	service.DBContext.First(user, "email = ?", emailValue)
+	service.DBContext.First(&user, "email = ?", emailValue)
+
+	if user.ID == 0 {
+		return nil
+	}
+
 	return user
 }
 
@@ -33,7 +43,7 @@ func (service *UserService) CreateUser(userRegister *dto.UserRegister, admin boo
 
 	service.DBContext.First(&existingUser, "email = ?", userRegister.Email)
 
-	if existingUser != nil {
+	if existingUser.ID != 0 {
 		return false
 	}
 
@@ -52,7 +62,7 @@ func (service *UserService) CreateUser(userRegister *dto.UserRegister, admin boo
 		Role:  role,
 	}
 
-	service.DBContext.Create(user)
+	service.DBContext.Create(&user)
 
 	return true
 }
@@ -131,20 +141,15 @@ func (service *UserService) UpdateEmail(user *models.User, newEmail string) bool
 		return false
 	}
 
-	user.Email = newEmail
+	if user.Email == newEmail {
+		return false
+	}
 
-	service.DBContext.UpdateColumn("pwd", user)
+	service.DBContext.Model(&user).Update("email", newEmail)
 	return true
 }
 
 func (service *UserService) UpdatePassword(user *models.User, newPassword string) string {
-
-	if user == nil {
-		return "USER_NOT_FOUND"
-	}
-
-	user.Pwd = newPassword
-
-	service.DBContext.UpdateColumn("pwd", user)
+	service.DBContext.Model(&user).Update("pwd", newPassword)
 	return "OK"
 }

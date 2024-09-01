@@ -15,7 +15,12 @@ type ProjectService struct {
 }
 
 func (service *ProjectService) GetById(projectId uint) (project *models.Project) {
-	service.DBContext.First(project, "id = ?", projectId)
+	service.DBContext.First(&project, "id = ?", projectId)
+
+	if project.ID == 0 {
+		return nil
+	}
+
 	return project
 }
 
@@ -24,15 +29,26 @@ func (service *ProjectService) SearchProjectsByName(name string) (projects []mod
 	return projects
 }
 
-func (service *ProjectService) CreateProject(projectCreate dto.ProjectCreate) bool {
+func (service *ProjectService) CreateProject(user *models.User, projectCreate *dto.ProjectCreate) string {
+
 	project := models.Project{
 		Name:        projectCreate.Name,
-		Description: sql.NullString{String: *projectCreate.Description},
+		Description: sql.NullString{},
+		UserID:      user.ID,
+	}
+
+	if projectCreate.Description != nil {
+		project.Description.String = *projectCreate.Description
+		project.Description.Valid = true
 	}
 
 	service.DBContext.Create(&project)
 
-	return project.ID != 0
+	if project.ID == 0 {
+		return "NOT_CREATED"
+	}
+
+	return "OK"
 }
 
 func (service *ProjectService) UpdateData(project *models.Project, name *string, description *string) bool {
@@ -58,10 +74,9 @@ func (service *ProjectService) EndProject(project *models.Project) bool {
 		return false
 	}
 
-	currentTime := time.Now().UTC()
-	project.EndedAt.Time = currentTime
+	currentTime := time.Now()
 
-	service.DBContext.Update("ended_at", project)
+	service.DBContext.Model(&project).Update("ended_at", currentTime)
 
 	return true
 }
