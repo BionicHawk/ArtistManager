@@ -19,6 +19,19 @@ func TestCreateProject(t *testing.T) {
 	}
 }
 
+func TestCreateProjectWithEmptyName(t *testing.T) {
+	controller := GenerateProjectController()
+	createArtist(controller)
+
+	result := controller.CreateProject(1, dto.ProjectCreate{
+		Name: "",
+	})
+
+	if result != "EMPTY_NAME" {
+		t.Fatalf("Expected 'EMPTY_NAME', got '%s'", result)
+	}
+}
+
 func TestCreateProjectDuplicate(t *testing.T) {
 	controller := GenerateProjectController()
 	createArtist(controller)
@@ -31,8 +44,8 @@ func TestCreateProjectDuplicate(t *testing.T) {
 		Name: "ProjectExample",
 	})
 
-	if result != "NOT_CREATED" {
-		t.Fatalf("Duplicates on projects shouldn't exist. Expected output 'NOT_CREATED', received '%s'", result)
+	if result != "NOT_CREATED_DUPLICATE" {
+		t.Fatalf("Duplicates on projects shouldn't exist. Expected output 'NOT_CREATED_DUPLICATE', received '%s'", result)
 	}
 }
 
@@ -51,6 +64,22 @@ func TestCreateWithDescription(t *testing.T) {
 
 	if result != "OK" && project.Description.String == description {
 		t.Fatalf("A project with description should be able to be created. Expected 'OK', received '%s'", result)
+	}
+}
+
+func TestCreateProjectWithEmptyDescription(t *testing.T) {
+	controller := GenerateProjectController()
+	createArtist(controller)
+
+	description := ""
+
+	result := controller.CreateProject(1, dto.ProjectCreate{
+		Name:        "A project",
+		Description: &description,
+	})
+
+	if result != "INVALID_DESCRIPTION_LENGTH" {
+		t.Fatalf("Expected 'INVALID_DESCRIPTION_LENGTH', got '%s'", result)
 	}
 }
 

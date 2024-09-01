@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/mattn/go-sqlite3"
 	"gorm.io/gorm"
 )
 
@@ -15,9 +16,9 @@ type ProjectService struct {
 }
 
 func (service *ProjectService) GetById(projectId uint) (project *models.Project) {
-	service.DBContext.First(&project, "id = ?", projectId)
+	err := service.DBContext.First(&project, "id = ?", projectId).Error
 
-	if project.ID == 0 {
+	if err != nil {
 		return nil
 	}
 
@@ -25,11 +26,15 @@ func (service *ProjectService) GetById(projectId uint) (project *models.Project)
 }
 
 func (service *ProjectService) SearchProjectsByName(name string) (projects []models.Project) {
-	service.DBContext.Where("name Like", fmt.Sprintf("%%%s%%", name)).Find(&projects)
+	service.DBContext.Where("name Like ?", fmt.Sprintf("%%%s%%", name)).Find(&projects)
 	return projects
 }
 
 func (service *ProjectService) CreateProject(user *models.User, projectCreate *dto.ProjectCreate) string {
+
+	if len(projectCreate.Name) == 0 {
+		return "EMPTY_NAME"
+	}
 
 	project := models.Project{
 		Name:        projectCreate.Name,
@@ -42,10 +47,17 @@ func (service *ProjectService) CreateProject(user *models.User, projectCreate *d
 		project.Description.Valid = true
 	}
 
-	service.DBContext.Create(&project)
+	err := service.DBContext.Create(&project).Error
 
-	if project.ID == 0 {
-		return "NOT_CREATED"
+	if err != nil {
+		sqliteErr := err.(sqlite3.Error)
+
+		switch sqliteErr.ExtendedCode {
+		case 275:
+			return "INVALID_DESCRIPTION_LENGTH"
+		case 2067:
+			return "NOT_CREATED_DUPLICATE"
+		}
 	}
 
 	return "OK"

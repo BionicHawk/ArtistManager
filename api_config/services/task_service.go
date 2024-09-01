@@ -31,7 +31,14 @@ func (service *TaskService) CreateTask(projectId uint, taskCreate *dto.TaskCreat
 		task.Description = taskCreate.Description
 	}
 
-	service.DBContext.Create(&task)
+	error := service.DBContext.Create(&task).Error
 
-	return task.ID != 0
+	return error == nil
+}
+
+func (service *TaskService) DeleteTask(taskId uint) bool {
+	var task *models.Task
+	error := service.DBContext.Delete(&task, taskId).Error
+
+	return error == nil
 }
