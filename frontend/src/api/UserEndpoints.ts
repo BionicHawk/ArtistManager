@@ -12,23 +12,21 @@ export default class UserEndpoints {
      * @param userRegister The data needed to create a new Admin User
      * @returns A container which will held an error if present
      */
-    public CreateAdmin(userRegister: dto.UserRegister): Result<void, ErrorCreateUserResult> {
-        let result = new Result<void, ErrorCreateUserResult>();
+    public CreateAdmin(userRegister: dto.UserRegister): CreateUserResult {
+        let result = CreateUserResult.OK;
 
         if (userRegister.email.match(this.EmailRegex) === null) {
-            result.errorOf(ErrorCreateUserResult.INVALID_EMAIL);
-            return result;
+            return CreateUserResult.INVALID_EMAIL;
         }
 
         if (userRegister.password.match(this.PasswordRegex) === null) {
-            result.errorOf(ErrorCreateUserResult.INVALID_PASSWORD);
-            return result; 
+            return CreateUserResult.INVALID_PASSWORD;
         }
 
         UserController.CreateAdmin(userRegister)
             .then(petitionResult => {
                 if (!petitionResult) {
-                    result.errorOf(ErrorCreateUserResult.USER_FOUND);
+                    result = CreateUserResult.USER_FOUND
                 }
             })
 
