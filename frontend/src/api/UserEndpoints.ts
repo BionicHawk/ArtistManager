@@ -78,27 +78,26 @@ export default class UserEndpoints {
      * @param oldPassword the current user's password. This will guarantee that the user is about
      * to change the password is the owner of the account
      * @param newPassword the new user password
-     * @returns a container that will held an error if present
+     * @returns a `ChangePasswordResult` enumerator that can help you handle Ok and error results
      */
-    public ChangePassword(userId: number, oldPassword: string, newPassword: string): Result<void, ErrorChangePassword> {
-        const result = new Result<void, ErrorChangePassword>();
+    public ChangePassword(userId: number, oldPassword: string, newPassword: string): ChangePasswordResult {
+        let result = ChangePasswordResult.OK;
 
         if (newPassword.match(this.PasswordRegex) === null) {
-            result.errorOf(ErrorChangePassword.INVALID_PASSWORD);
-            return result;
+            return ChangePasswordResult.INVALID_PASSWORD;
         }
 
         UserController.ChangePassword(userId, oldPassword, newPassword)
             .then(petitionResult => {
                 switch (petitionResult) {
                     case "USER_NOT_FOUND":
-                        result.errorOf(ErrorChangePassword.USER_NOT_FOUND);
+                        result = ChangePasswordResult.USER_NOT_FOUND;
                         break;
                     case "OLD_PASSWORD_INVALID":
-                        result.errorOf(ErrorChangePassword.OLD_PASSWORD_INVALID);
+                        result = ChangePasswordResult.OLD_PASSWORD_INVALID
                         break;
                     case "OK":
-                        result.of()
+                        result = ChangePasswordResult.OK
                         break;
                 }
             });
@@ -126,26 +125,11 @@ export default class UserEndpoints {
 
 }
 
-export class EndpointError <ErrObject> {
-    public Err: ErrObject;
-    public Message: string;
-
-    constructor(Err: ErrObject, Message: string) {
-        this.Err = Err;
-        this.Message = Message;
-    }
-}
-
-export enum ErrorChangePassword {
+export enum ChangePasswordResult {
+    OK,
     USER_NOT_FOUND,
     INVALID_PASSWORD,
     OLD_PASSWORD_INVALID
-}
-
-export enum ErrorCreateUserResult {
-    USER_FOUND,
-    INVALID_EMAIL,
-    INVALID_PASSWORD
 }
 
 export enum CreateUserResult {
