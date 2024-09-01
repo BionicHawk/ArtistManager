@@ -38,25 +38,23 @@ export default class UserEndpoints {
     /**
      * This function creates a new `User` into the database
      * @param userRegister the data needed to create the user
-     * @returns A container which will held an error if present
+     * @returns A `CreateUserResult` value, which you can use to handle Ok and Error results
      */
-    public CreateUser(userRegister: dto.UserRegister): Result<void,ErrorCreateUserResult> {
-        const result = new Result<void, ErrorCreateUserResult>();
+    public CreateUser(userRegister: dto.UserRegister): CreateUserResult {
+        let result = CreateUserResult.OK;
 
         if (userRegister.email.match(this.EmailRegex) === null) {
-            result.errorOf(ErrorCreateUserResult.INVALID_EMAIL);
-            return result;
+            return CreateUserResult.INVALID_EMAIL;
         }
 
         if (userRegister.password.match(this.PasswordRegex) === null) {
-            result.errorOf(ErrorCreateUserResult.INVALID_PASSWORD);
-            return result;
+            return CreateUserResult.INVALID_PASSWORD;
         }
 
         UserController.CreateUser(userRegister)
             .then(petitionResult => {
                 if (!petitionResult) {
-                    result.errorOf(ErrorCreateUserResult.USER_FOUND);
+                    result = CreateUserResult.USER_FOUND;
                 }
             });
 
@@ -147,6 +145,13 @@ export enum ErrorChangePassword {
 }
 
 export enum ErrorCreateUserResult {
+    USER_FOUND,
+    INVALID_EMAIL,
+    INVALID_PASSWORD
+}
+
+export enum CreateUserResult {
+    OK,
     USER_FOUND,
     INVALID_EMAIL,
     INVALID_PASSWORD
