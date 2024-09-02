@@ -1,0 +1,31 @@
+.loginContainer {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+}
+
+.formContainer {
+	overflow: hidden;
+	width: fit-content;
+	/* border-radius: 16px; */
+	/* background-color: var(--background-main-color);
+	backdrop-filter: var(--backdrop-filter);
+	-webkit-backdrop-filter: var(--backdrop-filter);
+	box-shadow: var(--tiny-shadow); */
+}
+
+.slideContainer {
+	display: flex;
+	flex-flow: row nowrap;
+	width: 200%;
+	transition: transform 0.5s ease;
+}
+
+.slideLeft {
+	transform: translateX(-50%);
+}
+
+.slideRight {
+	transform: translateX(0);
+}

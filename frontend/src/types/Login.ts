@@ -1,0 +1,1 @@
+export type TypeForm = 'LOGIN' | 'REGISTER';
