@@ -10,7 +10,7 @@ export default class UserEndpoints {
     /**
      * This function creates a new Admin `User` into the database
      * @param userRegister The data needed to create a new Admin User
-     * @returns A container which will held an error if present
+     * @returns A `CreateUserResult` which will let you handle Ok and Error responses
      */
     public CreateAdmin(userRegister: dto.UserRegister): CreateUserResult {
         let result = CreateUserResult.OK;
@@ -59,6 +59,12 @@ export default class UserEndpoints {
         return result;
     }
     
+    /**
+     * Will authenticate the user
+     * @param email 
+     * @param password 
+     * @returns The user info if success or null if else
+     */
     public Login(email: string, password: string): dto.UserDtoOut | null {
         let user: dto.UserDtoOut | null = null;
         
@@ -96,8 +102,41 @@ export default class UserEndpoints {
                     case "OLD_PASSWORD_INVALID":
                         result = ChangePasswordResult.OLD_PASSWORD_INVALID
                         break;
+                    case "SAME_PASSWORD_INVALID":
+                        result = ChangePasswordResult.SAME_PASSWORD_INVALID;
+                        break;
                     case "OK":
                         result = ChangePasswordResult.OK
+                        break;
+                }
+            });
+
+        return result;
+    }
+    
+    /**
+     * This function will attempt to change the email by referencing the user by its current email
+     * @param oldEmail the current user email
+     * @param newEmail the email to set on the user
+     * @returns a `ChangeEmailResult` enumerator which will help you handle Ok and Error results
+     */
+    public ChangeEmail(oldEmail: string, newEmail: string): ChangeEmailResult {
+        let result = ChangeEmailResult.OK;
+
+        UserController.ChangeEmail(oldEmail, newEmail)
+            .then(petitionResult => {
+                switch (petitionResult) {
+                    case "OK":
+                        result = ChangeEmailResult.OK;
+                        break;
+                    case "SAME_EMAIL":
+                        result = ChangeEmailResult.SAME_EMAIL;
+                        break;
+                    case "EMAIL_USED":
+                        result = ChangeEmailResult.EMAIL_USED;
+                        break;
+                    case "USER_NOT_FOUND":
+                        result = ChangeEmailResult.USER_NOT_FOUND;
                         break;
                 }
             });
@@ -123,12 +162,24 @@ export default class UserEndpoints {
         return gotUser;
     }
 
+    public SearchByName(nameTerm: string): Array<dto.UserDtoOut> {
+        let users: Array<dto.UserDtoOut> = []
+
+        UserController.SearchByName(nameTerm)
+            .then(results => {
+                users = [...users, ...results]
+            })
+
+        return users;
+    }
+
 }
 
 export enum ChangePasswordResult {
     OK,
     USER_NOT_FOUND,
     INVALID_PASSWORD,
+    SAME_PASSWORD_INVALID,
     OLD_PASSWORD_INVALID
 }
 
@@ -137,4 +188,11 @@ export enum CreateUserResult {
     USER_FOUND,
     INVALID_EMAIL,
     INVALID_PASSWORD
+}
+
+export enum ChangeEmailResult {
+    OK,
+    USER_NOT_FOUND,
+    SAME_EMAIL,
+    EMAIL_USED, 
 }

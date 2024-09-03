@@ -3,7 +3,7 @@
 import {os} from '../models';
 import {dto} from '../models';
 
-export function ChangeEmail(arg1:string,arg2:string):Promise<boolean>;
+export function ChangeEmail(arg1:string,arg2:string):Promise<string>;
 
 export function ChangePassword(arg1:number,arg2:string,arg3:string):Promise<string>;
 

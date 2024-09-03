@@ -22,16 +22,38 @@ func (service *TaskService) GetById(taskId uint) *models.Task {
 	return task
 }
 
-func (service *TaskService) CreateTask(projectId uint, taskCreate *dto.TaskCreate) bool {
-	task := &models.Task{
+func (service *TaskService) CreateTask(project *models.Project, taskCreate *dto.TaskCreate) bool {
+	task := models.Task{
 		ActivityName: taskCreate.ActivityName,
+		ProjectID:    project.ID,
 	}
 
 	if taskCreate.Description != nil {
 		task.Description = taskCreate.Description
 	}
 
-	service.DBContext.Create(&task)
+	err := service.DBContext.Create(&task).Error
 
-	return task.ID != 0
+	if err != nil {
+		return false
+	}
+
+	var count int64
+
+	service.DBContext.Model(&models.Task{}).Where("project_id = ?", project.ID).Count(&count)
+	service.DBContext.Model(&project).Update("number_of_tasks", count)
+
+	return true
+}
+
+func (service *TaskService) DeleteTask(taskId uint) bool {
+	var task *models.Task
+	err := service.DBContext.Delete(&task, taskId).Error
+
+	return err == nil
+}
+
+func (service *TaskService) DeleteAllFrpmProject(projectId uint) bool {
+	err := service.DBContext.Delete(&models.Task{}, "project_id = ?", projectId).Error
+	return err == nil
 }

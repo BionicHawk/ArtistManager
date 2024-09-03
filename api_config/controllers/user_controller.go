@@ -44,11 +44,11 @@ func (controller *UserController) Login(email string, password string) *dto.User
 	return &userOut
 }
 
-func (controller *UserController) ChangeEmail(oldEmail string, newEmail string) bool {
+func (controller *UserController) ChangeEmail(oldEmail string, newEmail string) string {
 	userOldEmail := controller.UserService.GetByEmail(oldEmail)
 
 	if userOldEmail == nil {
-		return false
+		return "USER_NOT_FOUND"
 	}
 
 	return controller.UserService.UpdateEmail(userOldEmail, newEmail)
