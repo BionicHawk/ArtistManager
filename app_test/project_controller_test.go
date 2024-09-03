@@ -2,7 +2,9 @@ package app_test
 
 import (
 	"ArtistManager/api_config/controllers"
+	"ArtistManager/api_config/models"
 	"ArtistManager/api_config/models/dto"
+	"fmt"
 	"testing"
 )
 
@@ -200,10 +202,50 @@ func TestMarkedAsDoneWithNotOwner(t *testing.T) {
 	}
 }
 
+func TestAddTaskToProject(t *testing.T) {
+	controller := GenerateProjectController()
+	createArtist(controller)
+
+	controller.CreateProject(1, dto.ProjectCreate{
+		Name: "A project",
+	})
+
+	result := controller.AddTask(1, 1, dto.TaskCreate{
+		ActivityName: "Start",
+	})
+
+	if result != "OK" {
+		t.Fatalf("Expected 'OK', got '%s'", result)
+	}
+}
+
 func createArtist(controller *controllers.ProjectController) bool {
 	return controller.UserService.CreateUser(&dto.UserRegister{
 		Name:     "Example",
 		Email:    "example@gmail.com",
 		Password: "Str0ngP455!",
 	}, false)
+}
+
+func TestAdd5TaskToProject(t *testing.T) {
+	controller := GenerateProjectController()
+	createArtist(controller)
+
+	controller.CreateProject(1, dto.ProjectCreate{
+		Name: "A project",
+	})
+
+	for i := 0; i < 5; i++ {
+		controller.AddTask(1, 1, dto.TaskCreate{
+			ActivityName: fmt.Sprintf("Task#%d", i+1),
+		})
+	}
+
+	var count int64
+
+	controller.TaskService.DBContext.Model(&models.Task{}).Where("project_id = ?", 1).Count(&count)
+
+	if count != 5 {
+		t.Fatalf("Expected 5 tasks, got %d items", count)
+	}
 }

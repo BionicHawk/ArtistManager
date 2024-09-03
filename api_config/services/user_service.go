@@ -14,9 +14,9 @@ type UserService struct {
 }
 
 func (service *UserService) GetById(id uint) (user *models.User) {
-	service.DBContext.First(&user, id)
+	err := service.DBContext.First(&user, id).Error
 
-	if user.ID == 0 {
+	if err != nil {
 		return nil
 	}
 
@@ -24,9 +24,9 @@ func (service *UserService) GetById(id uint) (user *models.User) {
 }
 
 func (service *UserService) GetByEmail(emailValue string) (user *models.User) {
-	service.DBContext.First(&user, "email = ?", emailValue)
+	err := service.DBContext.First(&user, "email = ?", emailValue).Error
 
-	if user.ID == 0 {
+	if err != nil {
 		return nil
 	}
 
@@ -41,9 +41,9 @@ func (service *UserService) SearchUsersByNameTerm(name string) (users []models.U
 func (service *UserService) CreateUser(userRegister *dto.UserRegister, admin bool) bool {
 	var existingUser *models.User
 
-	service.DBContext.First(&existingUser, "email = ?", userRegister.Email)
+	err := service.DBContext.First(&existingUser, "email = ?", userRegister.Email).Error
 
-	if existingUser.ID != 0 {
+	if err == nil {
 		return false
 	}
 
@@ -62,9 +62,7 @@ func (service *UserService) CreateUser(userRegister *dto.UserRegister, admin boo
 		Role:  role,
 	}
 
-	service.DBContext.Create(&user)
-
-	return true
+	return service.DBContext.Create(&user).Error == nil
 }
 
 func (service *UserService) UpdateProfilePicture(userId uint, file os.File) bool {
@@ -136,17 +134,18 @@ func (service *UserService) CreateDtoOut(user *models.User) dto.UserDtoOut {
 	}
 }
 
-func (service *UserService) UpdateEmail(user *models.User, newEmail string) bool {
-	if user == nil {
-		return false
-	}
-
+func (service *UserService) UpdateEmail(user *models.User, newEmail string) string {
 	if user.Email == newEmail {
-		return false
+		return "SAME_EMAIL"
 	}
 
-	service.DBContext.Model(&user).Update("email", newEmail)
-	return true
+	err := service.DBContext.Model(&user).Update("email", newEmail).Error
+
+	if err != nil {
+		return "EMAIL_USED"
+	}
+
+	return "OK"
 }
 
 func (service *UserService) UpdatePassword(user *models.User, newPassword string) string {

@@ -20,12 +20,14 @@ func main() {
 	// Services
 	userService := services.UserService{DBContext: dbContext}
 	projectService := services.ProjectService{DBContext: dbContext}
+	taskService := services.TaskService{DBContext: dbContext}
 
 	// Controllers
 	userController := controllers.UserController{UserService: &userService}
 	projectController := controllers.ProjectController{
 		ProjectService: &projectService,
 		UserService:    &userService,
+		TaskService:    &taskService,
 	}
 
 	// Create an instance of the app structure

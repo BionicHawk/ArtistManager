@@ -98,6 +98,20 @@ export namespace dto {
 		    return a;
 		}
 	}
+	export class TaskCreate {
+	    activityName: string;
+	    description?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new TaskCreate(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.activityName = source["activityName"];
+	        this.description = source["description"];
+	    }
+	}
 	
 	export class UserDtoOut {
 	    id: number;
@@ -213,6 +227,8 @@ export namespace models {
 	    // Go type: sql
 	    description: any;
 	    tasks: Task[];
+	    numberOfTasks: number;
+	    advancement: number;
 	    // Go type: time
 	    createdAt: any;
 	    // Go type: sql
@@ -229,6 +245,8 @@ export namespace models {
 	        this.name = source["name"];
 	        this.description = this.convertValues(source["description"], null);
 	        this.tasks = this.convertValues(source["tasks"], Task);
+	        this.numberOfTasks = source["numberOfTasks"];
+	        this.advancement = source["advancement"];
 	        this.createdAt = this.convertValues(source["createdAt"], null);
 	        this.endedAt = this.convertValues(source["endedAt"], null);
 	        this.userId = source["userId"];

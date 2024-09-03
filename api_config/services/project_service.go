@@ -4,10 +4,10 @@ import (
 	"ArtistManager/api_config/models"
 	"ArtistManager/api_config/models/dto"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
-	"github.com/mattn/go-sqlite3"
 	"gorm.io/gorm"
 )
 
@@ -27,6 +27,13 @@ func (service *ProjectService) GetById(projectId uint) (project *models.Project)
 
 func (service *ProjectService) SearchProjectsByName(name string) (projects []models.Project) {
 	service.DBContext.Where("name Like ?", fmt.Sprintf("%%%s%%", name)).Find(&projects)
+	return projects
+}
+
+func (service *ProjectService) GetFromUser(userId uint) []models.Project {
+	projects := []models.Project{}
+	service.DBContext.Where("user_id = ?", userId).Find(&projects)
+
 	return projects
 }
 
@@ -50,14 +57,11 @@ func (service *ProjectService) CreateProject(user *models.User, projectCreate *d
 	err := service.DBContext.Create(&project).Error
 
 	if err != nil {
-		sqliteErr := err.(sqlite3.Error)
-
-		switch sqliteErr.ExtendedCode {
-		case 275:
+		if errors.Is(err, gorm.ErrCheckConstraintViolated) {
 			return "INVALID_DESCRIPTION_LENGTH"
-		case 2067:
-			return "NOT_CREATED_DUPLICATE"
 		}
+
+		return "NOT_CREATED_DUPLICATE"
 	}
 
 	return "OK"

@@ -43,8 +43,13 @@ func GenerateProjectController() *controllers.ProjectController {
 		DBContext: db,
 	}
 
+	taskService := services.TaskService{
+		DBContext: db,
+	}
+
 	return &controllers.ProjectController{
 		ProjectService: &projectService,
 		UserService:    &userService,
+		TaskService:    &taskService,
 	}
 }

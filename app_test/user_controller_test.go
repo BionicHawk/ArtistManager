@@ -78,7 +78,7 @@ func TestChangeEmail(t *testing.T) {
 	result := controller.ChangeEmail("example@gmail.com", newEmail)
 	loginResult := controller.Login(newEmail, "Str0ngP455!")
 
-	if result == false || loginResult == nil {
+	if result != "OK" || loginResult == nil {
 		t.Fatalf("User should have this email '%s'", newEmail)
 	}
 
@@ -93,7 +93,7 @@ func TestChangeEmailWithWrongEmailSource(t *testing.T) {
 
 	result := controller.ChangeEmail(oldEmail, newEmail)
 
-	if result == true {
+	if result == "OK" {
 		t.Fatalf("'%s' does not exist in the DB, but somehow it 'changed' an email to '%s'", oldEmail, newEmail)
 	}
 }
@@ -106,7 +106,7 @@ func TestChangeSameEmail(t *testing.T) {
 
 	result := controller.ChangeEmail(oldEmail, oldEmail)
 
-	if result == true {
+	if result != "SAME_EMAIL" {
 		t.Fatalf("The user with an email '%s' should have not changed due to be the same email", oldEmail)
 	}
 }
