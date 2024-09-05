@@ -5,10 +5,8 @@ import (
 	"gorm.io/gorm"
 )
 
-const databaseFilename = "database.db3"
-
-func Init() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open(databaseFilename), &gorm.Config{})
+func Init(filename string) *gorm.DB {
+	db, err := gorm.Open(sqlite.Open(filename), &gorm.Config{})
 	if err != nil {
 		panic("Couldn't open the database!")
 	}

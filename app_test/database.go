@@ -4,22 +4,12 @@ import (
 	"ArtistManager/api_config/controllers"
 	"ArtistManager/api_config/models"
 	"ArtistManager/api_config/services"
-	"fmt"
-	"os"
 
 	"gorm.io/gorm"
 )
 
-const databaseFile = "database.db3"
-
 func loadDatabase() *gorm.DB {
-	err := os.Remove(databaseFile)
-
-	if err != nil {
-		fmt.Printf("No database named as '%s' was found, it will be rewrited", databaseFile)
-	}
-
-	return models.Init()
+        return models.Init(":memory:")
 }
 
 func GenerateUserController() *controllers.UserController {

@@ -16,7 +16,7 @@ import (
 var assets embed.FS
 
 func main() {
-	dbContext := models.Init()
+	dbContext := models.Init("database.db3")
 	// Services
 	userService := services.UserService{DBContext: dbContext}
 	projectService := services.ProjectService{DBContext: dbContext}

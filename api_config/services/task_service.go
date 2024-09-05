@@ -46,11 +46,17 @@ func (service *TaskService) CreateTask(project *models.Project, taskCreate *dto.
 	return true
 }
 
-func (service *TaskService) DeleteTask(taskId uint) bool {
+func (service *TaskService) DeleteTask(project *models.Project, taskId uint) bool {
 	var task *models.Task
 	err := service.DBContext.Delete(&task, taskId).Error
 
-	return err == nil
+    if err != nil {
+            return false
+    }
+
+    service.DBContext.Model(project).Update("number_of_tasks", project.NumberOfTasks - 1)
+
+	return true
 }
 
 func (service *TaskService) DeleteAllFrpmProject(projectId uint) bool {
