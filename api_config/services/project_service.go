@@ -4,10 +4,10 @@ import (
 	"ArtistManager/api_config/models"
 	"ArtistManager/api_config/models/dto"
 	"database/sql"
-	"errors"
 	"fmt"
 	"time"
 
+	"github.com/mattn/go-sqlite3"
 	"gorm.io/gorm"
 )
 
@@ -57,7 +57,9 @@ func (service *ProjectService) CreateProject(user *models.User, projectCreate *d
 	err := service.DBContext.Create(&project).Error
 
 	if err != nil {
-		if errors.Is(err, gorm.ErrCheckConstraintViolated) {
+		fmt.Println(err)
+		sqlError := err.(sqlite3.Error)
+		if sqlError.ExtendedCode == 275 {
 			return "INVALID_DESCRIPTION_LENGTH"
 		}
 

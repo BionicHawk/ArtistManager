@@ -4,6 +4,7 @@ import (
 	"ArtistManager/api_config/controllers"
 	"ArtistManager/api_config/models/dto"
 	"testing"
+    "fmt"
 )
 
 func TestCreateAdmin(t *testing.T) {
@@ -12,7 +13,9 @@ func TestCreateAdmin(t *testing.T) {
 
 	if result == false {
 		t.Fatalf("Couldn't create an Admin!\n")
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestCreateAdminDuplicate(t *testing.T) {
@@ -22,7 +25,9 @@ func TestCreateAdminDuplicate(t *testing.T) {
 
 	if result == true {
 		t.Fatalf("There should not be any duplicate")
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestGetExistingUser(t *testing.T) {
@@ -34,7 +39,9 @@ func TestGetExistingUser(t *testing.T) {
 
 	if result == nil {
 		t.Fatalf("No user found!")
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestGetNotExistingUser(t *testing.T) {
@@ -44,7 +51,9 @@ func TestGetNotExistingUser(t *testing.T) {
 
 	if result != nil {
 		t.Fatalf("It should've gave nil")
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestLogin(t *testing.T) {
@@ -56,7 +65,9 @@ func TestLogin(t *testing.T) {
 
 	if result == nil {
 		t.Fatalf("It should be a successful login")
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestLoginNoUser(t *testing.T) {
@@ -66,7 +77,9 @@ func TestLoginNoUser(t *testing.T) {
 
 	if result != nil {
 		t.Fatalf("It should've gave nil")
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestChangeEmail(t *testing.T) {
@@ -80,7 +93,9 @@ func TestChangeEmail(t *testing.T) {
 
 	if result != "OK" || loginResult == nil {
 		t.Fatalf("User should have this email '%s'", newEmail)
+        return
 	}
+    fmt.Println("Done!")
 
 }
 
@@ -95,7 +110,9 @@ func TestChangeEmailWithWrongEmailSource(t *testing.T) {
 
 	if result == "OK" {
 		t.Fatalf("'%s' does not exist in the DB, but somehow it 'changed' an email to '%s'", oldEmail, newEmail)
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestChangeSameEmail(t *testing.T) {
@@ -108,7 +125,9 @@ func TestChangeSameEmail(t *testing.T) {
 
 	if result != "SAME_EMAIL" {
 		t.Fatalf("The user with an email '%s' should have not changed due to be the same email", oldEmail)
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestChangePassword(t *testing.T) {
@@ -121,7 +140,9 @@ func TestChangePassword(t *testing.T) {
 
 	if result != "OK" {
 		t.Fatalf("Password '%s' should have been set. Output = '%s'", newPassword, result)
+        return
 	}
+    fmt.Println("Done!")
 
 }
 
@@ -135,7 +156,9 @@ func TestChangePassword2NotExistingUser(t *testing.T) {
 
 	if result != "USER_NOT_FOUND" {
 		t.Fatalf("USER_NOT_FOUND expected as result, it gave '%s' instead", result)
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestChangePasswordWithWrongOldPassword(t *testing.T) {
@@ -149,7 +172,9 @@ func TestChangePasswordWithWrongOldPassword(t *testing.T) {
 
 	if result != "OLD_PASSWORD_INVALID" {
 		t.Fatalf("'OLD_PASSWORD_INVALID' expected, instead it returned '%s'", result)
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestChangePasswordWithSamePassword(t *testing.T) {
@@ -162,7 +187,9 @@ func TestChangePasswordWithSamePassword(t *testing.T) {
 
 	if result != "SAME_PASSWORD_INVALID" {
 		t.Fatalf("'SAME_PASSWORD_INVALID' expected as response, but received '%s' instead", result)
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestSearchUsers(t *testing.T) {
@@ -200,7 +227,9 @@ func TestSearchUsers(t *testing.T) {
 
 	if len(results) != 4 {
 		t.Fatalf("Results doesn't contain the expected number of entities. Expected %d, got %d", 4, len(results))
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestSearchUsersWithNoResults(t *testing.T) {
@@ -239,7 +268,9 @@ func TestSearchUsersWithNoResults(t *testing.T) {
 
 	if len(results) != 0 {
 		t.Fatalf("A search with term '%s', should not retrieve any entity due to the database not containing any user with a name like it. Got %d entities", term, len(results))
+        return
 	}
+    fmt.Println("Done!")
 
 }
 

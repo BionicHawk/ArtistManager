@@ -18,7 +18,9 @@ func TestCreateProject(t *testing.T) {
 
 	if result != "OK" {
 		t.Fatalf("It should have been created!")
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestCreateProjectWithEmptyName(t *testing.T) {
@@ -31,7 +33,9 @@ func TestCreateProjectWithEmptyName(t *testing.T) {
 
 	if result != "EMPTY_NAME" {
 		t.Fatalf("Expected 'EMPTY_NAME', got '%s'", result)
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestCreateProjectDuplicate(t *testing.T) {
@@ -48,7 +52,9 @@ func TestCreateProjectDuplicate(t *testing.T) {
 
 	if result != "NOT_CREATED_DUPLICATE" {
 		t.Fatalf("Duplicates on projects shouldn't exist. Expected output 'NOT_CREATED_DUPLICATE', received '%s'", result)
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestCreateWithDescription(t *testing.T) {
@@ -66,7 +72,9 @@ func TestCreateWithDescription(t *testing.T) {
 
 	if result != "OK" && project.Description.String == description {
 		t.Fatalf("A project with description should be able to be created. Expected 'OK', received '%s'", result)
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestCreateProjectWithEmptyDescription(t *testing.T) {
@@ -82,7 +90,9 @@ func TestCreateProjectWithEmptyDescription(t *testing.T) {
 
 	if result != "INVALID_DESCRIPTION_LENGTH" {
 		t.Fatalf("Expected 'INVALID_DESCRIPTION_LENGTH', got '%s'", result)
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestSearchProjects(t *testing.T) {
@@ -114,7 +124,9 @@ func TestSearchProjects(t *testing.T) {
 
 	if len(results) != 4 {
 		t.Fatalf("Expected %d entities, got %d entities instead", 4, len(results))
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestMarkProjectDone(t *testing.T) {
@@ -127,12 +139,14 @@ func TestMarkProjectDone(t *testing.T) {
 
 	controller.CreateProject(1, project)
 
-	result := controller.MaskAsDone(1, 1)
+	result := controller.MarkAsDone(1, 1)
 	createdProject := controller.ProjectService.GetById(1)
 
 	if result != "OK" && createdProject.EndedAt.Valid {
 		t.Fatalf("Expected 'OK', got '%s'", result)
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestMarkAsDoneProjectMarkedAsDone(t *testing.T) {
@@ -143,23 +157,27 @@ func TestMarkAsDoneProjectMarkedAsDone(t *testing.T) {
 		Name: "A project",
 	})
 
-	controller.MaskAsDone(1, 1)
-	result := controller.MaskAsDone(1, 1)
+	controller.MarkAsDone(1, 1)
+	result := controller.MarkAsDone(1, 1)
 
 	if result != "ALREADY_MARKED" {
 		t.Fatalf("Expected 'ALREADY_MARKED', got '%s'", result)
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestMarkedAsDoneNoExistingProject(t *testing.T) {
 	controller := GenerateProjectController()
 	createArtist(controller)
 
-	result := controller.MaskAsDone(1, 1)
+	result := controller.MarkAsDone(1, 1)
 
 	if result != "PROJECT_NOT_FOUND" {
 		t.Fatalf("Expected 'PROJECT_NOT_FOUND', got '%s'", result)
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestMarkedAsDoneWithNotExistingUser(t *testing.T) {
@@ -170,11 +188,13 @@ func TestMarkedAsDoneWithNotExistingUser(t *testing.T) {
 		Name: "A project",
 	})
 
-	result := controller.MaskAsDone(2, 1)
+	result := controller.MarkAsDone(2, 1)
 
 	if result != "USER_NOT_FOUND" {
 		t.Fatalf("Expected 'USER_NOT_FOUND', got '%s'", result)
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestMarkedAsDoneWithNotOwner(t *testing.T) {
@@ -195,11 +215,13 @@ func TestMarkedAsDoneWithNotOwner(t *testing.T) {
 
 	controller.CreateProject(1, project)
 
-	result := controller.MaskAsDone(2, 1)
+	result := controller.MarkAsDone(2, 1)
 
 	if result != "NOT_PROJECT_OWNER" {
 		t.Fatalf("Expected 'NOT_PROJECT_OWNER', got '%s'", result)
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func TestAddTaskToProject(t *testing.T) {
@@ -216,7 +238,9 @@ func TestAddTaskToProject(t *testing.T) {
 
 	if result != "OK" {
 		t.Fatalf("Expected 'OK', got '%s'", result)
+        return
 	}
+    fmt.Println("Done!")
 }
 
 func createArtist(controller *controllers.ProjectController) bool {
@@ -247,5 +271,7 @@ func TestAdd5TaskToProject(t *testing.T) {
 
 	if count != 5 {
 		t.Fatalf("Expected 5 tasks, got %d items", count)
+        return
 	}
+    fmt.Println("Done!")
 }
