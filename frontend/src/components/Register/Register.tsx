@@ -154,7 +154,7 @@ export const Register = ({ handleChangeTypeForm }: RegisterProps) => {
       email: dataForm.email,
       name: dataForm.name,
       password: dataForm.password
-     })
+    })
 
     const result = await userEndpoints.CreateAdmin({
       email: dataForm.email,
