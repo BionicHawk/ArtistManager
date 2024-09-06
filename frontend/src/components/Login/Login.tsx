@@ -110,17 +110,7 @@ export const Login = ({ handleChangeTypeForm }: { handleChangeTypeForm: (type: T
           </FormControl>
           <Typography><Link to='' className={ styles.forgotPassword }>¿Olvidó su contraseña?</Link></Typography>
         </div>
-        <div className={ styles.secondaryActions }>
-          <FormControl className={ styles.formControl }>
-            <FormControlLabel control={<Checkbox />} label='Recordar sesión' />
-          </FormControl>
-          <Typography><Link to='' className={ styles.forgotPassword }>¿Olvidó su contraseña?</Link></Typography>
-        </div>
 
-        <div className={ styles.actionButtons }>
-          <Button variant='contained' type='submit'>Iniciar sesión</Button>
-          <Typography>¿No tienes cuenta? <span className={ styles.redirectToRegister } onClick={ () => handleChangeTypeForm( 'REGISTER' ) }>Registrate aquí</span></Typography>
-        </div>
         <div className={ styles.actionButtons }>
           <Button variant='contained' type='submit'>Iniciar sesión</Button>
           <Typography>¿No tienes cuenta? <span className={ styles.redirectToRegister } onClick={ () => handleChangeTypeForm( 'REGISTER' ) }>Registrate aquí</span></Typography>
