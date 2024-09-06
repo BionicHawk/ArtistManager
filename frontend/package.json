@@ -11,10 +11,7 @@
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
-<<<<<<< HEAD
-=======
     "@mui/icons-material": "^6.0.2",
->>>>>>> 0a4eb8537dad1d5b62dac2392a2c5c5fc02c9232
     "@mui/material": "^6.0.1",
     "@types/react-router-dom": "^5.3.3",
     "react": "^18.2.0",

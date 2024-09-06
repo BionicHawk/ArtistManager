@@ -8,21 +8,6 @@
 .form {
 	display: flex;
 	flex-direction: column;
-<<<<<<< HEAD
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	width: 100%;
-	margin: 24px;
-}
-
-.h2 {
-	margin: 0;
-}
-
-.p {
-	margin: 0;
-=======
 	justify-content: center;
 	gap: 32px;
 	width: 80%;
@@ -68,5 +53,4 @@
 
 .forgotPassword:visited {
 	color: inherit;
->>>>>>> 0a4eb8537dad1d5b62dac2392a2c5c5fc02c9232
 }

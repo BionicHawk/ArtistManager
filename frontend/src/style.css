@@ -19,11 +19,7 @@ body {
 }
 
 #root {
-<<<<<<< HEAD
-    background-color: rgba(0, 0, 0, 0.6);
-=======
     /* background-color: rgba(0, 0, 0, 0.6); */
->>>>>>> 0a4eb8537dad1d5b62dac2392a2c5c5fc02c9232
     min-width: 100vw;
     min-height: 100vh;
 }
