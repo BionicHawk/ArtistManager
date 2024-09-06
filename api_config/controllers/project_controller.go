@@ -44,6 +44,29 @@ func (controller *ProjectController) AddTask(userId uint, projectId uint, taskCr
 	return "OK"
 }
 
+func (controller *ProjectController) DeleteProject(userId uint, projectId uint) string {
+	user := controller.UserService.GetById(userId)
+
+	if user == nil {
+		return "USER_NOT_FOUND"
+	}
+
+	deletionTaskResutl := controller.TaskService.DeleteAllFromProject(projectId)
+
+	if !deletionTaskResutl {
+		return "PROJECT_NOT_FOUND"
+	}
+
+	result := controller.ProjectService.DeleteProject(projectId)
+
+	if !result {
+		return "COULD_NOT_DELETE_PROJECT"
+	}
+
+	return "OK"
+
+}
+
 func (controller *ProjectController) GetFromUser(userId uint) []models.Project {
 	return controller.ProjectService.GetFromUser(userId)
 }
@@ -79,17 +102,17 @@ func (controller *ProjectController) MarkAsDone(userId uint, projectId uint) str
 }
 
 func (controller *ProjectController) DeleteTask(projectId uint, taskId uint) string {
-        project := controller.ProjectService.GetById(projectId)
+	project := controller.ProjectService.GetById(projectId)
 
-        if project == nil {
-                return "PROJECT_NOT_FOUND"
-        }
+	if project == nil {
+		return "PROJECT_NOT_FOUND"
+	}
 
-        result := controller.TaskService.DeleteTask(project, taskId)
+	result := controller.TaskService.DeleteTask(project, taskId)
 
-        if !result {
-                return "TASK_NOT_FOUND"
-        }
+	if !result {
+		return "TASK_NOT_FOUND"
+	}
 
-        return "OK"
+	return "OK"
 }

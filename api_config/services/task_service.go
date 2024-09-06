@@ -59,7 +59,7 @@ func (service *TaskService) DeleteTask(project *models.Project, taskId uint) boo
 	return true
 }
 
-func (service *TaskService) DeleteAllFrpmProject(projectId uint) bool {
+func (service *TaskService) DeleteAllFromProject(projectId uint) bool {
 	err := service.DBContext.Delete(&models.Task{}, "project_id = ?", projectId).Error
 	return err == nil
 }
