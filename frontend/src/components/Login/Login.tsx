@@ -37,15 +37,10 @@ export const Login = ({ handleChangeTypeForm }: { handleChangeTypeForm: (type: T
     event.preventDefault();
   };
 
-  const handleSubmit = ( event: React.FormEvent<HTMLFormElement> ) => {
+  const handleSubmit = async ( event: React.FormEvent<HTMLFormElement> ) => {
     event.preventDefault();
 
-    const result = userEndpoints.Login( dataForm.email, dataForm.password );
-    
-    // TODO: Quitar los consoles.log de esta función
-    console.log( dataForm );
-
-    console.log( result ); // result está retornando null
+    const result = await userEndpoints.Login( dataForm.email, dataForm.password );
 
     if ( result === null ) {
       console.log( 'Error al iniciar sesión' );

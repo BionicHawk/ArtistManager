@@ -12,7 +12,7 @@ export default class UserEndpoints {
      * @param userRegister The data needed to create a new Admin User
      * @returns A `CreateUserResult` which will let you handle Ok and Error responses
      */
-    public CreateAdmin(userRegister: dto.UserRegister): CreateUserResult {
+    public async CreateAdmin(userRegister: dto.UserRegister): Promise<CreateUserResult> {
         let result = CreateUserResult.OK;
 
         if (userRegister.email.match(this.EmailRegex) === null) {
@@ -23,7 +23,7 @@ export default class UserEndpoints {
             return CreateUserResult.INVALID_PASSWORD;
         }
 
-        UserController.CreateAdmin(userRegister)
+        await UserController.CreateAdmin(userRegister)
             .then(petitionResult => {
                 if (!petitionResult) {
                     result = CreateUserResult.USER_FOUND
@@ -65,16 +65,12 @@ export default class UserEndpoints {
      * @param password 
      * @returns The user info if success or null if else
      */
-    public Login(email: string, password: string): dto.UserDtoOut | null {
+    public async Login(email: string, password: string): Promise<dto.UserDtoOut | null> {
         let user: dto.UserDtoOut | null = null;
         
-        UserController.Login(email, password)
-            .then(userResult => {
-                if (userResult !== null) {
-                    user = userResult;
-                }
-            });
-
+        await UserController.Login(email, password)
+            .then(userResult => {user = userResult});
+            
         return user;
     }
 

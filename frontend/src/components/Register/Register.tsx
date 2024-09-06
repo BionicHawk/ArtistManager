@@ -138,7 +138,7 @@ export const Register = ({ handleChangeTypeForm }: RegisterProps) => {
     return isInvalidPassword;
   }
 
-  const handleSubmit = ( e: FormEvent ) => {
+  const handleSubmit = async ( e: FormEvent ) => {
     e.preventDefault();
 
     if( checkName() ) alert( 'Nombre inválido' );
@@ -156,20 +156,25 @@ export const Register = ({ handleChangeTypeForm }: RegisterProps) => {
       password: dataForm.password
      })
 
-    const result = userEndpoints.CreateAdmin({
+    const result = await userEndpoints.CreateAdmin({
       email: dataForm.email,
       name: dataForm.name,
       password: dataForm.password,
     });
 
+    debugger;
     // FIXME: No funciona user_found
     if( result === CreateUserResult.OK ) {
+      debugger
       handleLogin();
     } else if( result === CreateUserResult.USER_FOUND ) {
+      debugger
       alert( 'El usuario ya existe' );
     } else if( result === CreateUserResult.INVALID_EMAIL ) {
+      debugger
       alert( 'Correo electrónico inválido' );
     } else if( result === CreateUserResult.INVALID_PASSWORD ) {
+      debugger
       alert( 'Contraseña inválida' );
     }
   }
