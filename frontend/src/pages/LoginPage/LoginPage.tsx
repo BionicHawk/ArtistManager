@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Container, Login, Register } from "../../components";
 import './../../style.css';
 import { TypeForm } from "../../types/Login";
-import styles from './Login.module.css';
+import styles from './LoginPage.module.css';
 
 
 export const LoginPage = () => {

@@ -54,7 +54,7 @@ func main() {
 		Windows: &windows.Options{
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
-			BackdropType:         windows.Acrylic,
+			BackdropType:         windows.Mica,
 		},
 	})
 

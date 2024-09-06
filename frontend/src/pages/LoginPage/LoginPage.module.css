@@ -19,7 +19,7 @@
 	display: flex;
 	flex-flow: row nowrap;
 	width: 200%;
-	transition: transform 0.5s ease;
+	transition: transform 0.3s cubic-bezier(.42,.11,.3,1);
 }
 
 .slideLeft {
