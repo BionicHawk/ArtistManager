@@ -17,16 +17,18 @@ import (
 var assets embed.FS
 
 func main() {
-	dbContext := models.Init()
+	dbContext := models.Init("database.db3")
 	// Services
 	userService := services.UserService{DBContext: dbContext}
 	projectService := services.ProjectService{DBContext: dbContext}
+	taskService := services.TaskService{DBContext: dbContext}
 
 	// Controllers
 	userController := controllers.UserController{UserService: &userService}
 	projectController := controllers.ProjectController{
 		ProjectService: &projectService,
 		UserService:    &userService,
+		TaskService:    &taskService,
 	}
 
 	// Create an instance of the app structure
@@ -34,9 +36,11 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:  "ArtistManager",
-		Width:  1024,
-		Height: 768,
+		Title:     "ArtistManager",
+		Width:     854,
+		Height:    480,
+		MinWidth:  720,
+		MinHeight: 480,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
@@ -50,7 +54,7 @@ func main() {
 		Windows: &windows.Options{
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
-			BackdropType:         windows.Acrylic,
+			BackdropType:         windows.Mica,
 		},
 	})
 

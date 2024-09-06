@@ -17,6 +17,17 @@
                 "-o",
                 "build/bin/ArtistManager.exe"
             ]
+        },
+        {
+            "label": "build_&_run",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "command": "wails",
+            "args": [
+                "build"
+            ]
         }
     ]
 }

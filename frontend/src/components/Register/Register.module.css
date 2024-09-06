@@ -8,6 +8,7 @@
 .form {
 	display: flex;
 	flex-direction: column;
+<<<<<<< HEAD
 	align-items: center;
 	justify-content: center;
 	gap: 8px;
@@ -21,4 +22,77 @@
 
 .p {
 	margin: 0;
+=======
+	justify-content: center;
+	gap: 32px;
+	width: 80%;
+}
+
+.title {
+	font-size: 24px;
+	line-height: 100%;
+	margin: 0;
+}
+
+.textfields {
+	display: flex;
+	flex-flow: column nowrap;
+	gap: 16px;
+}
+
+.secondaryActions {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.actionButtons {
+	display: flex;
+	flex-flow: column nowrap;
+	gap: 16px;
+	align-items: center;
+	justify-content: center;
+}
+
+.formControl { 
+	display: flex !important;
+	flex-flow: row nowrap !important;
+	align-items: center !important;
+}
+
+.redirectToRegister {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.forgotPassword:visited {
+	color: inherit;
+}
+
+.passwordRequirements {
+	display: flex;
+	flex-flow: column nowrap;
+	align-items: flex-start;
+	gap: 1px;
+	margin-left: 16px;
+}
+
+.passwordRequirement {
+	display: flex;
+	flex-flow: row nowrap;
+	gap: 8px;
+	align-items: center;
+	opacity: 0.8;
+}
+
+.icon {
+	color: rgba(255, 255, 255, 0.8);
+	font-size: 0.8rem !important;
+}
+
+.textRequriement {
+	color: rgba(255, 255, 255, 0.6);
+	font-size: 0.8rem !important;
+>>>>>>> 0a4eb8537dad1d5b62dac2392a2c5c5fc02c9232
 }

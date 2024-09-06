@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/mattn/go-sqlite3"
 	"gorm.io/gorm"
 )
 
@@ -15,24 +16,57 @@ type ProjectService struct {
 }
 
 func (service *ProjectService) GetById(projectId uint) (project *models.Project) {
-	service.DBContext.First(project, "id = ?", projectId)
+	err := service.DBContext.First(&project, "id = ?", projectId).Error
+
+	if err != nil {
+		return nil
+	}
+
 	return project
 }
 
 func (service *ProjectService) SearchProjectsByName(name string) (projects []models.Project) {
-	service.DBContext.Where("name Like", fmt.Sprintf("%%%s%%", name)).Find(&projects)
+	service.DBContext.Where("name Like ?", fmt.Sprintf("%%%s%%", name)).Find(&projects)
 	return projects
 }
 
-func (service *ProjectService) CreateProject(projectCreate dto.ProjectCreate) bool {
-	project := models.Project{
-		Name:        projectCreate.Name,
-		Description: sql.NullString{String: *projectCreate.Description},
+func (service *ProjectService) GetFromUser(userId uint) []models.Project {
+	projects := []models.Project{}
+	service.DBContext.Where("user_id = ?", userId).Find(&projects)
+
+	return projects
+}
+
+func (service *ProjectService) CreateProject(user *models.User, projectCreate *dto.ProjectCreate) string {
+
+	if len(projectCreate.Name) == 0 {
+		return "EMPTY_NAME"
 	}
 
-	service.DBContext.Create(&project)
+	project := models.Project{
+		Name:        projectCreate.Name,
+		Description: sql.NullString{},
+		UserID:      user.ID,
+	}
 
-	return project.ID != 0
+	if projectCreate.Description != nil {
+		project.Description.String = *projectCreate.Description
+		project.Description.Valid = true
+	}
+
+	err := service.DBContext.Create(&project).Error
+
+	if err != nil {
+		fmt.Println(err)
+		sqlError := err.(sqlite3.Error)
+		if sqlError.ExtendedCode == 275 {
+			return "INVALID_DESCRIPTION_LENGTH"
+		}
+
+		return "NOT_CREATED_DUPLICATE"
+	}
+
+	return "OK"
 }
 
 func (service *ProjectService) UpdateData(project *models.Project, name *string, description *string) bool {
@@ -58,10 +92,9 @@ func (service *ProjectService) EndProject(project *models.Project) bool {
 		return false
 	}
 
-	currentTime := time.Now().UTC()
-	project.EndedAt.Time = currentTime
+	currentTime := time.Now()
 
-	service.DBContext.Update("ended_at", project)
+	service.DBContext.Model(&project).Update("ended_at", currentTime)
 
 	return true
 }

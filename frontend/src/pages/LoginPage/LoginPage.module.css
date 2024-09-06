@@ -1,0 +1,32 @@
+.loginContainer {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+}
+
+.formContainer {
+	overflow: hidden;
+	width: fit-content;
+	padding: 72px 24px;
+	/* border-radius: 16px; */
+	/* background-color: var(--background-main-color);
+	backdrop-filter: var(--backdrop-filter);
+	-webkit-backdrop-filter: var(--backdrop-filter);
+	box-shadow: var(--tiny-shadow); */
+}
+
+.slideContainer {
+	display: flex;
+	flex-flow: row nowrap;
+	width: 200%;
+	transition: transform 0.3s cubic-bezier(.42,.11,.3,1);
+}
+
+.slideLeft {
+	transform: translateX(-50%);
+}
+
+.slideRight {
+	transform: translateX(0);
+}

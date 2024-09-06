@@ -14,12 +14,22 @@ type UserService struct {
 }
 
 func (service *UserService) GetById(id uint) (user *models.User) {
-	service.DBContext.First(user, id)
+	err := service.DBContext.First(&user, id).Error
+
+	if err != nil {
+		return nil
+	}
+
 	return user
 }
 
 func (service *UserService) GetByEmail(emailValue string) (user *models.User) {
-	service.DBContext.First(user, "email = ?", emailValue)
+	err := service.DBContext.First(&user, "email = ?", emailValue).Error
+
+	if err != nil {
+		return nil
+	}
+
 	return user
 }
 
@@ -31,9 +41,9 @@ func (service *UserService) SearchUsersByNameTerm(name string) (users []models.U
 func (service *UserService) CreateUser(userRegister *dto.UserRegister, admin bool) bool {
 	var existingUser *models.User
 
-	service.DBContext.First(&existingUser, "email = ?", userRegister.Email)
+	err := service.DBContext.First(&existingUser, "email = ?", userRegister.Email).Error
 
-	if existingUser != nil {
+	if err == nil {
 		return false
 	}
 
@@ -52,9 +62,7 @@ func (service *UserService) CreateUser(userRegister *dto.UserRegister, admin boo
 		Role:  role,
 	}
 
-	service.DBContext.Create(user)
-
-	return true
+	return service.DBContext.Create(&user).Error == nil
 }
 
 func (service *UserService) UpdateProfilePicture(userId uint, file os.File) bool {
@@ -126,25 +134,21 @@ func (service *UserService) CreateDtoOut(user *models.User) dto.UserDtoOut {
 	}
 }
 
-func (service *UserService) UpdateEmail(user *models.User, newEmail string) bool {
-	if user == nil {
-		return false
+func (service *UserService) UpdateEmail(user *models.User, newEmail string) string {
+	if user.Email == newEmail {
+		return "SAME_EMAIL"
 	}
 
-	user.Email = newEmail
+	err := service.DBContext.Model(&user).Update("email", newEmail).Error
 
-	service.DBContext.UpdateColumn("pwd", user)
-	return true
+	if err != nil {
+		return "EMAIL_USED"
+	}
+
+	return "OK"
 }
 
 func (service *UserService) UpdatePassword(user *models.User, newPassword string) string {
-
-	if user == nil {
-		return "USER_NOT_FOUND"
-	}
-
-	user.Pwd = newPassword
-
-	service.DBContext.UpdateColumn("pwd", user)
+	service.DBContext.Model(&user).Update("pwd", newPassword)
 	return "OK"
 }
