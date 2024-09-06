@@ -37,10 +37,15 @@ export const Login = ({ handleChangeTypeForm }: { handleChangeTypeForm: (type: T
     event.preventDefault();
   };
 
-  const handleSubmit = async ( event: React.FormEvent<HTMLFormElement> ) => {
+  const handleSubmit = ( event: React.FormEvent<HTMLFormElement> ) => {
     event.preventDefault();
 
-    const result = await userEndpoints.Login( dataForm.email, dataForm.password );
+    const result = userEndpoints.Login( dataForm.email, dataForm.password );
+    
+    // TODO: Quitar los consoles.log de esta función
+    console.log( dataForm );
+
+    console.log( result ); // result está retornando null
 
     if ( result === null ) {
       console.log( 'Error al iniciar sesión' );
@@ -105,7 +110,17 @@ export const Login = ({ handleChangeTypeForm }: { handleChangeTypeForm: (type: T
           </FormControl>
           <Typography><Link to='' className={ styles.forgotPassword }>¿Olvidó su contraseña?</Link></Typography>
         </div>
+        <div className={ styles.secondaryActions }>
+          <FormControl className={ styles.formControl }>
+            <FormControlLabel control={<Checkbox />} label='Recordar sesión' />
+          </FormControl>
+          <Typography><Link to='' className={ styles.forgotPassword }>¿Olvidó su contraseña?</Link></Typography>
+        </div>
 
+        <div className={ styles.actionButtons }>
+          <Button variant='contained' type='submit'>Iniciar sesión</Button>
+          <Typography>¿No tienes cuenta? <span className={ styles.redirectToRegister } onClick={ () => handleChangeTypeForm( 'REGISTER' ) }>Registrate aquí</span></Typography>
+        </div>
         <div className={ styles.actionButtons }>
           <Button variant='contained' type='submit'>Iniciar sesión</Button>
           <Typography>¿No tienes cuenta? <span className={ styles.redirectToRegister } onClick={ () => handleChangeTypeForm( 'REGISTER' ) }>Registrate aquí</span></Typography>
