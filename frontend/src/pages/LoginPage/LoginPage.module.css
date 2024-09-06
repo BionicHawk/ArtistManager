@@ -8,6 +8,7 @@
 .formContainer {
 	overflow: hidden;
 	width: fit-content;
+	padding: 72px 24px;
 	/* border-radius: 16px; */
 	/* background-color: var(--background-main-color);
 	backdrop-filter: var(--backdrop-filter);

@@ -1,6 +1,26 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { PrivateRoute, PublicLayout, PublicRoute } from "../components";
 import { LoginPage } from "../pages";
+import { useAuthStore } from "../store";
+import { useEffect } from "react";
+
+
+
+
+const PrivatePageExample = () => {
+	const { logout } = useAuthStore();
+	
+	// useEffect( () => {
+	// 	logout();
+	// }, [] )
+
+	return (
+		<div>
+			<h1>Private Page</h1>
+		</div>
+	);
+};
+
 
 export const routes = createBrowserRouter([
 	{
@@ -13,7 +33,7 @@ export const routes = createBrowserRouter([
 	},
 	{
 		path: "/home",
-		element: <PrivateRoute><div>Ruta privada</div></PrivateRoute>,
+		element: <PrivateRoute><PrivatePageExample /></PrivateRoute>,
 	},
 	{
 		path: "*",

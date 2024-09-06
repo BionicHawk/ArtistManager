@@ -11,7 +11,6 @@
 	justify-content: center;
 	gap: 32px;
 	width: 80%;
-	padding: 72px 24px;
 }
 
 .title {
@@ -54,4 +53,30 @@
 
 .forgotPassword:visited {
 	color: inherit;
+}
+
+.passwordRequirements {
+	display: flex;
+	flex-flow: column nowrap;
+	align-items: flex-start;
+	gap: 1px;
+	margin-left: 16px;
+}
+
+.passwordRequirement {
+	display: flex;
+	flex-flow: row nowrap;
+	gap: 8px;
+	align-items: center;
+	opacity: 0.8;
+}
+
+.icon {
+	color: rgba(255, 255, 255, 0.8);
+	font-size: 0.8rem !important;
+}
+
+.textRequriement {
+	color: rgba(255, 255, 255, 0.6);
+	font-size: 0.8rem !important;
 }
