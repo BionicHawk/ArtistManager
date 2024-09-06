@@ -138,7 +138,7 @@ export const Register = ({ handleChangeTypeForm }: RegisterProps) => {
     return isInvalidPassword;
   }
 
-  const handleSubmit = ( e: FormEvent ) => {
+  const handleSubmit = async ( e: FormEvent ) => {
     e.preventDefault();
 
     if( checkName() ) alert( 'Nombre inválido' );
@@ -156,7 +156,7 @@ export const Register = ({ handleChangeTypeForm }: RegisterProps) => {
       password: dataForm.password
      })
 
-    const result = userEndpoints.CreateAdmin({
+    const result = await userEndpoints.CreateAdmin({
       email: dataForm.email,
       name: dataForm.name,
       password: dataForm.password,
