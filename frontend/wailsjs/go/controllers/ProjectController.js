@@ -10,6 +10,10 @@ export function CreateProject(arg1, arg2) {
   return window['go']['controllers']['ProjectController']['CreateProject'](arg1, arg2);
 }
 
+export function DeleteProject(arg1, arg2) {
+  return window['go']['controllers']['ProjectController']['DeleteProject'](arg1, arg2);
+}
+
 export function DeleteTask(arg1, arg2) {
   return window['go']['controllers']['ProjectController']['DeleteTask'](arg1, arg2);
 }
