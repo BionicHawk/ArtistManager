@@ -9,10 +9,10 @@ export default class ProjectEndpoints {
      * @param projectCreate 
      * @returns a `CreateProjectResult` enumerator which will help yout to handle Ok and Error results
      */
-    public CreateProject(userId: number, projectCreate: dto.ProjectCreate): CreateProjectResult {
+    public async CreateProject(userId: number, projectCreate: dto.ProjectCreate): Promise<CreateProjectResult> {
         let result = CreateProjectResult.OK;
         
-        ProjectController.CreateProject(userId, projectCreate)
+        await ProjectController.CreateProject(userId, projectCreate)
             .then(petitionResult => {
                 switch (petitionResult) {
                     case "OK":
@@ -43,10 +43,10 @@ export default class ProjectEndpoints {
      * @param taskCreate 
      * @returns 
      */
-    public AddTask(userId: number, projectId: number, taskCreate: dto.TaskCreate): AddTaskResult {
+    public async AddTask(userId: number, projectId: number, taskCreate: dto.TaskCreate): Promise<AddTaskResult> {
         let result = AddTaskResult.OK;
 
-        ProjectController.AddTask(userId, projectId, taskCreate)
+        await ProjectController.AddTask(userId, projectId, taskCreate)
             .then(taskResult => {
                 switch (taskResult) {
                     case "OK":
@@ -71,10 +71,10 @@ export default class ProjectEndpoints {
      * Get all projects from referenced User
      * @param userId 
      */
-    public GetFromUser(userId: number): Array<models.Project> {
+    public async GetFromUser(userId: number): Promise<Array<models.Project>> {
         let projects: Array<models.Project> = []
 
-        ProjectController.GetFromUser(userId)
+        await ProjectController.GetFromUser(userId)
             .then(projectsResult => {
                 projects = [...projects, ...projectsResult];
             })
@@ -87,10 +87,10 @@ export default class ProjectEndpoints {
      * @param searchTerm 
      * @returns 
      */
-    public GetProjectsBySearchName(searchTerm: string): Array<models.Project> {
+    public async GetProjectsBySearchName(searchTerm: string): Promise<Array<models.Project>> {
         let projects: Array<models.Project> = [];
 
-        ProjectController.GetProjectsBySearchName(searchTerm)
+        await ProjectController.GetProjectsBySearchName(searchTerm)
             .then(projectsResult => {
                 projects = [...projects, ...projectsResult];
             })
@@ -98,10 +98,10 @@ export default class ProjectEndpoints {
         return projects;
     }
     
-    public MarkAsDone(userId: number, projectId: number): MarkAsDoneResult {
+    public async MarkAsDone(userId: number, projectId: number): Promise<MarkAsDoneResult> {
         let result = MarkAsDoneResult.OK;
 
-        ProjectController.MarkAsDone(userId, projectId)
+        await ProjectController.MarkAsDone(userId, projectId)
             .then(markResult => {
                 switch (markResult) {
                     case "OK":

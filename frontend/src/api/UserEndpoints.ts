@@ -12,7 +12,7 @@ export default class UserEndpoints {
      * @param userRegister The data needed to create a new Admin User
      * @returns A `CreateUserResult` which will let you handle Ok and Error responses
      */
-    public CreateAdmin(userRegister: dto.UserRegister): CreateUserResult {
+    public async CreateAdmin(userRegister: dto.UserRegister): Promise<CreateUserResult> {
         let result = CreateUserResult.OK;
 
         if (userRegister.email.match(this.EmailRegex) === null) {
@@ -23,7 +23,7 @@ export default class UserEndpoints {
             return CreateUserResult.INVALID_PASSWORD;
         }
 
-        UserController.CreateAdmin(userRegister)
+        await UserController.CreateAdmin(userRegister)
             .then(petitionResult => {
                 if (!petitionResult) {
                     result = CreateUserResult.USER_FOUND
@@ -38,7 +38,7 @@ export default class UserEndpoints {
      * @param userRegister the data needed to create the user
      * @returns A `CreateUserResult` value, which you can use to handle Ok and Error results
      */
-    public CreateUser(userRegister: dto.UserRegister): CreateUserResult {
+    public async CreateUser(userRegister: dto.UserRegister): Promise<CreateUserResult> {
         let result = CreateUserResult.OK;
 
         if (userRegister.email.match(this.EmailRegex) === null) {
@@ -49,7 +49,7 @@ export default class UserEndpoints {
             return CreateUserResult.INVALID_PASSWORD;
         }
 
-        UserController.CreateUser(userRegister)
+        await UserController.CreateUser(userRegister)
             .then(petitionResult => {
                 if (!petitionResult) {
                     result = CreateUserResult.USER_FOUND;
@@ -65,15 +65,11 @@ export default class UserEndpoints {
      * @param password 
      * @returns The user info if success or null if else
      */
-    public Login(email: string, password: string): dto.UserDtoOut | null {
+    public async Login(email: string, password: string): Promise<dto.UserDtoOut | null> {
         let user: dto.UserDtoOut | null = null;
         
-        UserController.Login(email, password)
-            .then(userResult => {
-                if (userResult !== null) {
-                    user = userResult;
-                }
-            });
+        await UserController.Login(email, password)
+            .then(userResult => {user = userResult});
 
         return user;
     }
@@ -86,14 +82,14 @@ export default class UserEndpoints {
      * @param newPassword the new user password
      * @returns a `ChangePasswordResult` enumerator that can help you handle Ok and error results
      */
-    public ChangePassword(userId: number, oldPassword: string, newPassword: string): ChangePasswordResult {
+    public async ChangePassword(userId: number, oldPassword: string, newPassword: string): Promise<ChangePasswordResult> {
         let result = ChangePasswordResult.OK;
 
         if (newPassword.match(this.PasswordRegex) === null) {
             return ChangePasswordResult.INVALID_PASSWORD;
         }
 
-        UserController.ChangePassword(userId, oldPassword, newPassword)
+        await UserController.ChangePassword(userId, oldPassword, newPassword)
             .then(petitionResult => {
                 switch (petitionResult) {
                     case "USER_NOT_FOUND":
@@ -120,10 +116,10 @@ export default class UserEndpoints {
      * @param newEmail the email to set on the user
      * @returns a `ChangeEmailResult` enumerator which will help you handle Ok and Error results
      */
-    public ChangeEmail(oldEmail: string, newEmail: string): ChangeEmailResult {
+    public async ChangeEmail(oldEmail: string, newEmail: string): Promise<ChangeEmailResult> {
         let result = ChangeEmailResult.OK;
 
-        UserController.ChangeEmail(oldEmail, newEmail)
+        await UserController.ChangeEmail(oldEmail, newEmail)
             .then(petitionResult => {
                 switch (petitionResult) {
                     case "OK":
@@ -149,23 +145,19 @@ export default class UserEndpoints {
      * @param userId The user id
      * @returns The user if exists or `null` otherwise
      */
-    public GetUser(userId: number): dto.UserDtoOut | null {
+    public async GetUser(userId: number): Promise<dto.UserDtoOut | null> {
         let gotUser: dto.UserDtoOut | null = null;
         
-        UserController.GetUser(userId)
-            .then(user => {
-                if (user !== null) {
-                    gotUser = user;
-                }
-            })
+        await UserController.GetUser(userId)
+            .then(user => {gotUser = user})
 
         return gotUser;
     }
 
-    public SearchByName(nameTerm: string): Array<dto.UserDtoOut> {
+    public async SearchByName(nameTerm: string): Promise<Array<dto.UserDtoOut>> {
         let users: Array<dto.UserDtoOut> = []
 
-        UserController.SearchByName(nameTerm)
+        await UserController.SearchByName(nameTerm)
             .then(results => {
                 users = [...users, ...results]
             })
