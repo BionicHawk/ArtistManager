@@ -1,5 +1,5 @@
 import {dto} from "../../wailsjs/go/models";
-import UserController from "../../wailsjs/go/controllers/UserController";
+import * as UserController from "../../wailsjs/go/controllers/UserController";
 import Result from "./container/Result";
 
 export default class UserEndpoints {
