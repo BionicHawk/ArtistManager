@@ -66,7 +66,7 @@ export const Register = ({ handleChangeTypeForm }: RegisterProps) => {
   });
 
   const { login } = useAuthStore();
-  const { openAlert } = useAlert();
+  // const { openAlert } = useAlert();
   // const { setUser } = useUserStore();
 
 
