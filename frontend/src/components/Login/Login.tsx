@@ -79,9 +79,9 @@ export const Login = ({ handleChangeTypeForm }: { handleChangeTypeForm: (type: T
             onFocus={ onFocusInput }
           />
           <FormControl variant="filled">
-              <InputLabel htmlFor="password">Contraseña</InputLabel>
+              <InputLabel htmlFor="password-login">Contraseña</InputLabel>
               <FilledInput
-                id="password"
+                id="password-login"
                 type={showPassword ? 'text' : 'password'}
                 size='small'
                 name='password'

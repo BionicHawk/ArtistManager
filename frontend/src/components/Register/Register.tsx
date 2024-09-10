@@ -6,6 +6,7 @@ import { VisibilityOff, Visibility, CheckCircle, CancelOutlined } from '@mui/ico
 import styles from './Register.module.css';
 import { TypeForm } from '../../types/Login';
 import { useAuthStore, useUserStore } from '../../store';
+import { useAlert } from '../../hooks/useAlert';
 
 interface RegisterProps {
   handleChangeTypeForm: (type: TypeForm) => void;
@@ -65,7 +66,8 @@ export const Register = ({ handleChangeTypeForm }: RegisterProps) => {
   });
 
   const { login } = useAuthStore();
-  const { setUser } = useUserStore();
+  const { openAlert } = useAlert();
+  // const { setUser } = useUserStore();
 
 
 
@@ -166,7 +168,9 @@ export const Register = ({ handleChangeTypeForm }: RegisterProps) => {
     if( result === CreateUserResult.OK ) {
       handleLogin();
     } else if( result === CreateUserResult.USER_FOUND ) {
-      alert( 'El usuario ya existe' );
+      // alert( 'El usuario ya existe' );
+      // openAlert({  }) // FIXME: Revisar qué falta para que funcione el hook de alertas
+
     } else if( result === CreateUserResult.INVALID_EMAIL ) {
       alert( 'Correo electrónico inválido' );
     } else if( result === CreateUserResult.INVALID_PASSWORD ) {
@@ -222,9 +226,9 @@ export const Register = ({ handleChangeTypeForm }: RegisterProps) => {
             helperText={ invalidEmail ? 'Correo electrónico inválido' : '' }
           />
           <FormControl variant="filled">
-            <InputLabel htmlFor="password">Contraseña</InputLabel>
+            <InputLabel htmlFor="password-register">Contraseña</InputLabel>
             <FilledInput
-              id="password"
+              id="password-register"
               type={showPassword ? 'text' : 'password'}
               size='small'
               name={ InputsNames.PASSWORD }
