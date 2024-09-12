@@ -1,9 +1,9 @@
 import { Payload, useAlertStore } from "../store/useAlertStore"
 
-export const useAlert = ( props: Payload) => {
+export const useAlert = () => {
 	const { openAlert, closeAlert } = useAlertStore();
 
-	const handleOpenAlert = () => {
+	const handleOpenAlert = ( props: Payload ) => {
 		openAlert(props);
 	};
 

@@ -38,13 +38,13 @@ export const useAlertStore = create<State & Action>((set) => ({
 	severity: 'info',
 	message: '',
 	variant: 'filled',
-	openAlert: ( payload: Payload ) => set(() => ({
+	openAlert: ( payload: Payload ) => set(( state ) => ({
 		open: true,
 		message: payload.message,
-		duration: payload?.duration || 3000,
-		position: payload?.position || { vertical: 'top', horizontal: 'right' },
-		severity: payload?.severity || 'info',
-		variant: payload?.variant || 'filled',
+		duration: payload?.duration || state.duration,
+		position: payload?.position || state.position,
+		severity: payload?.severity || state.severity,
+		variant: payload?.variant || state.variant,
 	})),
 	closeAlert: () => set(() => ({
 		open: false,

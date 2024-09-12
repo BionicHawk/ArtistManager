@@ -7,6 +7,7 @@ import { useState } from 'react';
 import useForm from '../../hooks/useForm';
 import UserEndpoints from '../../api/UserEndpoints';
 import { useAuthStore } from '../../store';
+import { useAlert } from '../../hooks/useAlert';
 
 export const Login = ({ handleChangeTypeForm }: { handleChangeTypeForm: (type: TypeForm) => void; }) => {
   const userEndpoints = new UserEndpoints();
@@ -20,6 +21,8 @@ export const Login = ({ handleChangeTypeForm }: { handleChangeTypeForm: (type: T
     email: '',
     password: '',
   } );
+
+  const { openAlert } = useAlert();
 
   const { login } = useAuthStore();
 
@@ -37,18 +40,20 @@ export const Login = ({ handleChangeTypeForm }: { handleChangeTypeForm: (type: T
     event.preventDefault();
   };
 
-  const handleSubmit = ( event: React.FormEvent<HTMLFormElement> ) => {
+  const handleSubmit = async ( event: React.FormEvent<HTMLFormElement> ) => {
     event.preventDefault();
 
-    const result = userEndpoints.Login( dataForm.email, dataForm.password );
     
-    // TODO: Quitar los consoles.log de esta función
-    console.log( dataForm );
+    const result = await userEndpoints.Login( dataForm.email, dataForm.password );
 
-    console.log( result ); // result está retornando null
-
+    console.log({ result });
+    return;
+    
     if ( result === null ) {
-      console.log( 'Error al iniciar sesión' );
+      // TODO: Estaría bien colocar el error personalizado según el tipo de error
+      // Usuario no encontrado, contraseña incorrecta, error genérico, etc.
+      // resul
+      openAlert({ message: 'Error al iniciar sesión.', severity: 'error' });
       return;
     }
 
