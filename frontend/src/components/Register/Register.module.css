@@ -59,8 +59,7 @@
 	display: flex;
 	flex-flow: column nowrap;
 	align-items: flex-start;
-	gap: 1px;
-	margin-left: 16px;
+	gap: 4px;
 }
 
 .passwordRequirement {
@@ -69,6 +68,7 @@
 	gap: 8px;
 	align-items: center;
 	opacity: 0.8;
+	/* margin-left: 8px; */
 }
 
 .icon {

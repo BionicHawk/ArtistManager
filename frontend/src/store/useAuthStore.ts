@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware'
+import { useUserStore } from './useUserStore';
 
 type State = {
   isAuth:		Boolean;
@@ -13,7 +14,10 @@ type Action = {
 export const useAuthStore = create(persist<State & Action>((set) => ({
   isAuth: false,
   login: () => set(() => ({ isAuth: true })),
-	logout: () => set(() => ({ isAuth: false })),
+	logout: () => {
+		useUserStore.getState().deleteUser();
+		set(() => ({ isAuth: false }))
+	},
 }),
 {
 	name: 'isAuth',

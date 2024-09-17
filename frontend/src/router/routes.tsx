@@ -1,16 +1,22 @@
-import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
-import { GeneralLayout, PrivateRoute, PublicLayout, PublicRoute } from "../components";
+import { createBrowserRouter, Navigate, Outlet, useNavigate } from "react-router-dom";
+import { GeneralLayout, PrivateLayout, PrivateRoute, PublicLayout, PublicRoute } from "../components";
 import { LoginPage } from "../pages";
-import { useAuthStore } from "../store";
-import { useEffect } from "react";
-
-
+import { useAuthStore, useUserStore } from "../store";
 
 
 const PrivatePageExample = () => {
+	const { logout } = useAuthStore();
+	const { user } = useUserStore();
+	const navigate = useNavigate();
+
 	return (
 		<div>
-			<h1>Private Page</h1>
+			<h1 style={{ margin: 0, }}>Private Page</h1>
+			<> { console.log( { user } ) } </>
+			<button onClick={ () => {
+				logout();
+				navigate('/');
+			} }>Log out</button>
 		</div>
 	);
 };
@@ -18,24 +24,32 @@ const PrivatePageExample = () => {
 
 export const routes = createBrowserRouter([
 	{
-		// path: "/",
 		element: <GeneralLayout />,
 		children: [
+			{
+				path: "/",
+				element: <Navigate to="/login" />,
+				index: true,
+			},
 			{
 				path: "/login",
 				element: <PublicRoute><PublicLayout><LoginPage /></PublicLayout></PublicRoute>,
 				
 			},
 			{
+				path: "/layout",
+				element: <PublicRoute><PrivateLayout><PrivatePageExample /></PrivateLayout></PublicRoute>,
+				
+			},
+			{
 				path: "/home",
-				element: <PrivateRoute><PrivatePageExample /></PrivateRoute>,
+				element: <PrivateRoute><PrivateLayout><PrivatePageExample /></PrivateLayout></PrivateRoute>,
 			},
 			{
 				path: "*",
-				element: <Navigate to="/login" />,
+				element: <Navigate to="/" />,
 			}
 		]
-		// element: <Navigate to="/login" />,
 	},
 ]);
 

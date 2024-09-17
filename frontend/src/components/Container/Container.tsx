@@ -15,7 +15,6 @@ export const Container = ({ children, className, style }: ContainerProps) => {
 };
 
 const containerStyles: React.CSSProperties = {
-	backgroundColor: 'rgba(0, 0, 0, 0.14)',
+	backgroundColor: 'rgba(0, 0, 0, 0.6)',
 	borderRadius: 24,
-	// backdropFilter: 'blur(0px)',
 };

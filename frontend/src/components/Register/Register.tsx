@@ -1,12 +1,13 @@
 import { FormEvent, useEffect, useState } from 'react';
 import UserEndpoints, { CreateUserResult } from '../../api/UserEndpoints';
 import useForm from '../../hooks/useForm';
-import { Button, FilledInput, FormControl, FormHelperText, Icon, IconButton, InputAdornment, InputLabel, TextField, Typography } from '@mui/material';
+import { Button, FilledInput, FormControl, FormHelperText, Icon, IconButton, InputAdornment, InputLabel, LinearProgress, TextField, Typography, linearProgressClasses, useTheme } from '@mui/material';
 import { VisibilityOff, Visibility, CheckCircle, CancelOutlined } from '@mui/icons-material';
 import styles from './Register.module.css';
 import { TypeForm } from '../../types/Login';
 import { useAuthStore, useUserStore } from '../../store';
 import { useAlert } from '../../hooks/useAlert';
+import { useNavigate } from 'react-router-dom';
 
 interface RegisterProps {
   handleChangeTypeForm: (type: TypeForm) => void;
@@ -33,28 +34,8 @@ export const Register = ({ handleChangeTypeForm }: RegisterProps) => {
   const [showPassword, setShowPassword] = useState( false );
   const [invalidEmail, setInvalidEmail] = useState( false );
   const [invalidPassword, setInvalidPassword] = useState( false );
-  const [reasonInvalidPassword, setReasonInvalidPassword] = useState( [
-    {
-      id: InvalidPasswordReasonId.LENGTH,
-      reason: 'La contraseña debe tener 8 carácteres',
-      isValid: false,
-    },
-    {
-      id: InvalidPasswordReasonId.LOWERCASE,
-      reason: 'La contraseña debe tener al menos una letra minúscula',
-      isValid: false,
-    },
-    {
-      id: InvalidPasswordReasonId.UPPERCASE,
-      reason: 'La contraseña debe tener al menos una letra mayúscula',
-      isValid: false,
-    },
-    {
-      id: InvalidPasswordReasonId.NUMBER,
-      reason: 'La contraseña debe tener al menos un número',
-      isValid: false,
-    },
-  ] );
+  const [passwordProgress, setPasswordProgress] = useState( 0 );
+  const [reasonInvalidPassword, setReasonInvalidPassword] = useState<{ id: number, reason: string, } | null>( null );
 
 
 
@@ -66,8 +47,10 @@ export const Register = ({ handleChangeTypeForm }: RegisterProps) => {
   });
 
   const { login } = useAuthStore();
-  // const { openAlert } = useAlert();
-  // const { setUser } = useUserStore();
+  const { openAlert } = useAlert();
+  const navigate = useNavigate();
+  const { setUser } = useUserStore();
+  const theme = useTheme();
 
 
 
@@ -102,6 +85,7 @@ export const Register = ({ handleChangeTypeForm }: RegisterProps) => {
   }
 
   const checkPassword = () => {
+    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm;
     const lengthRegex = /^.{8,}$/;
     const lowercaseRegex = /[a-z]/;
     const uppercaseRegex = /[A-Z]/;
@@ -109,26 +93,60 @@ export const Register = ({ handleChangeTypeForm }: RegisterProps) => {
 
     const password = dataForm.password;
 
-    setReasonInvalidPassword( [
-      {
-        ...reasonInvalidPassword[InvalidPasswordReasonId.LENGTH],
-        isValid: lengthRegex.test( password ),
-      },
-      {
-        ...reasonInvalidPassword[InvalidPasswordReasonId.LOWERCASE],
-        isValid: lowercaseRegex.test( password ),
-      },
-      {
-        ...reasonInvalidPassword[InvalidPasswordReasonId.UPPERCASE],
-        isValid: uppercaseRegex.test( password ),
-      },
-      {
-        ...reasonInvalidPassword[InvalidPasswordReasonId.NUMBER],
-        isValid: numberRegex.test( password ),
-      },
-    ] );
+    const totalCriteries = 4;
 
-    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm;
+    const isLowercaseValid = lowercaseRegex.test( password );
+    const isUppercaseValid = uppercaseRegex.test( password );
+    const isNumberValid = numberRegex.test( password );
+    const isLengthValid = lengthRegex.test( password );
+
+    const criteriesAprobed = [isLengthValid, isLowercaseValid, isUppercaseValid, isNumberValid].reduce( (acc, isValid) => isValid ? acc + 1 : acc, 0 );
+
+    setPasswordProgress( (criteriesAprobed / totalCriteries) * 100 );
+
+    if( !isLowercaseValid ) {
+      setReasonInvalidPassword( {
+        id: InvalidPasswordReasonId.LOWERCASE,
+        reason: 'La contraseña debe tener al menos una letra minúscula',
+      } );
+    } else if ( !isUppercaseValid ) {
+      setReasonInvalidPassword( {
+        id: InvalidPasswordReasonId.UPPERCASE,
+        reason: 'La contraseña debe tener al menos una letra mayúscula',
+      } );
+    } else if ( !isNumberValid ) {
+      setReasonInvalidPassword( {
+        id: InvalidPasswordReasonId.NUMBER,
+        reason: 'La contraseña debe tener al menos un número',
+      } );
+    } else if ( !isLengthValid ) {
+      setReasonInvalidPassword( {
+        id: InvalidPasswordReasonId.LENGTH,
+        reason: 'La contraseña debe tener al menos 8 caracteres',
+      } );
+    } else {
+      setReasonInvalidPassword( null );
+    }
+    
+
+
+    // setReasonInvalidPassword(
+    //   {
+    //     ...reasonInvalidPassword[InvalidPasswordReasonId.LOWERCASE],
+    //     isValid: lowercaseRegex.test( password ),
+    //   },
+    //   {
+    //     ...reasonInvalidPassword[InvalidPasswordReasonId.UPPERCASE],
+    //     isValid: uppercaseRegex.test( password ),
+    //   },
+    //   {
+    //     ...reasonInvalidPassword[InvalidPasswordReasonId.NUMBER],
+    //     isValid: numberRegex.test( password ),
+    //   },
+    //   {
+    //     ...reasonInvalidPassword[InvalidPasswordReasonId.LENGTH],
+    //     isValid: lengthRegex.test( password ),
+    //   });    
 
     const isInvalidPassword =
       dataForm.password.match( passwordRegex ) === null
@@ -143,20 +161,13 @@ export const Register = ({ handleChangeTypeForm }: RegisterProps) => {
   const handleSubmit = async ( e: FormEvent ) => {
     e.preventDefault();
 
-    if( checkName() ) alert( 'Nombre inválido' );
+    if( checkName() ) openAlert({ message: 'Nombre inválido', severity: 'error' });
 
-    if( checkEmail() ) alert( 'Correo electrónico inválido' );
+    if( checkEmail() ) openAlert({ message: 'Correo electrónico inválido', severity: 'error' });
 
-    if( checkPassword() ) alert( 'Contraseña inválida' );
+    if( checkPassword() ) openAlert({ message: 'Contraseña inválida', severity: 'error' });
 
     if( checkName() || checkEmail() || checkPassword() ) return;
-
-    // TODO: Quitar este console.log
-    console.log({ 
-      email: dataForm.email,
-      name: dataForm.name,
-      password: dataForm.password
-    })
 
     const result = await userEndpoints.CreateAdmin({
       email: dataForm.email,
@@ -164,22 +175,27 @@ export const Register = ({ handleChangeTypeForm }: RegisterProps) => {
       password: dataForm.password,
     });
 
-    // FIXME: No funciona user_found
     if( result === CreateUserResult.OK ) {
       handleLogin();
-    } else if( result === CreateUserResult.USER_FOUND ) {
-      // alert( 'El usuario ya existe' );
-      // openAlert({  }) // FIXME: Revisar qué falta para que funcione el hook de alertas
-
-    } else if( result === CreateUserResult.INVALID_EMAIL ) {
-      alert( 'Correo electrónico inválido' );
-    } else if( result === CreateUserResult.INVALID_PASSWORD ) {
-      alert( 'Contraseña inválida' );
     }
+    
+    if( result === CreateUserResult.USER_FOUND ) openAlert({ message: 'El correo electrónico ya está en uso.', severity: 'error' });
+    
+    if( result === CreateUserResult.INVALID_EMAIL ) openAlert({ message: 'Correo electrónico inválido.', severity: 'error' });
+    
+    if( result === CreateUserResult.INVALID_PASSWORD ) openAlert({ message: 'Contraseña inválida.', severity: 'error' });
   }
 
-  const handleLogin = () => {
-    // TODO: Hacer set del usuario en el store
+  const handleLogin = async () => {
+    const response = await userEndpoints.Login( dataForm.email, dataForm.password );
+    
+    if( response === null ) {
+      navigate('/login');
+      return;
+    }
+
+
+    setUser( response );
     login();
   };
 
@@ -253,17 +269,14 @@ export const Register = ({ handleChangeTypeForm }: RegisterProps) => {
           </FormControl>
 
           <div className={ styles.passwordRequirements }>
-            { reasonInvalidPassword.map( (reason, index) => (
-              <span className={ styles.passwordRequirement } key={ index }>
-                <Icon className={ styles.icon }>
-                  {
-                    reason.isValid
-                      ? <CheckCircle className={ styles.icon } color='success' />
-                      : <CancelOutlined className={ styles.icon } color='error' />
-                  }
-                </Icon>
-                <Typography className={ styles.textRequriement } color={ reason.isValid ? 'success' : 'error' }>{ reason.reason }</Typography>
-              </span> ) )
+            <LinearProgress variant="determinate" value={ passwordProgress } color={
+              passwordProgress < 99 ? 'error' : 'success'
+            } sx={{ width: '100%', }} />
+            {
+              reasonInvalidPassword !== null &&
+              <span className={ styles.passwordRequirement }>
+                <Typography className={ styles.textRequriement } color={ 'error' }>{ reasonInvalidPassword.reason }</Typography>
+              </span>
             }
           </div>
         </div>        

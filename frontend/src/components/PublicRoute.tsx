@@ -9,6 +9,7 @@ interface PublicRouteProps {
 export const PublicRoute = ({ children }: PublicRouteProps): JSX.Element => {
 	const { isAuth } = useAuthStore();
 
+
 	return (
 		isAuth ? <Navigate to='/home' /> : <>{ children }</>
 	);

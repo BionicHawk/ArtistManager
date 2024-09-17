@@ -6,8 +6,10 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useState } from 'react';
 import useForm from '../../hooks/useForm';
 import UserEndpoints from '../../api/UserEndpoints';
-import { useAuthStore } from '../../store';
+import { useAuthStore, useUserStore } from '../../store';
 import { useAlert } from '../../hooks/useAlert';
+import { User } from '../../interfaces';
+import { saveRemeberSession } from '../../utils/saveRememberSession';
 
 export const Login = ({ handleChangeTypeForm }: { handleChangeTypeForm: (type: TypeForm) => void; }) => {
   const userEndpoints = new UserEndpoints();
@@ -17,13 +19,14 @@ export const Login = ({ handleChangeTypeForm }: { handleChangeTypeForm: (type: T
 
 
 
-  const { dataForm, onChangeInput, onFocusInput } = useForm( {
+  const { dataForm, onChangeInput, onFocusInput, setDataForm } = useForm( {
     email: '',
     password: '',
+    rememberSession: false,
   } );
 
   const { openAlert } = useAlert();
-
+  const { setUser } = useUserStore();
   const { login } = useAuthStore();
 
 
@@ -43,22 +46,21 @@ export const Login = ({ handleChangeTypeForm }: { handleChangeTypeForm: (type: T
   const handleSubmit = async ( event: React.FormEvent<HTMLFormElement> ) => {
     event.preventDefault();
 
-    
     const result = await userEndpoints.Login( dataForm.email, dataForm.password );
-
-    console.log({ result });
-    return;
     
     if ( result === null ) {
-      // TODO: Estaría bien colocar el error personalizado según el tipo de error
-      // Usuario no encontrado, contraseña incorrecta, error genérico, etc.
-      // resul
       openAlert({ message: 'Error al iniciar sesión.', severity: 'error' });
       return;
     }
 
-    login();
+    saveRemeberSession( dataForm.rememberSession );
 
+    handleLogin( result );
+  };
+
+  const handleLogin = ( userResult: User) => {
+    setUser( userResult );
+    login();
   };
 
 
@@ -111,9 +113,9 @@ export const Login = ({ handleChangeTypeForm }: { handleChangeTypeForm: (type: T
 
         <div className={ styles.secondaryActions }>
           <FormControl className={ styles.formControl }>
-            <FormControlLabel control={<Checkbox />} label='Recordar sesión' />
+            <FormControlLabel control={<Checkbox onClickCapture={ () => setDataForm({ ...dataForm, rememberSession: !dataForm.rememberSession }) } checked={ dataForm.rememberSession } />} label='Recordar sesión' />
           </FormControl>
-          <Typography><Link to='' className={ styles.forgotPassword }>¿Olvidó su contraseña?</Link></Typography>
+          <Typography><Link to='' className={ styles.forgotPassword }>Olvidé mi contraseña</Link></Typography>
         </div>
 
         <div className={ styles.actionButtons }>

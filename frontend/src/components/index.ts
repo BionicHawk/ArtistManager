@@ -1,5 +1,6 @@
 export * from './Layouts/PublicLayout/PublicLayout';
 export * from './Layouts/GeneralLayout/GeneralLayout';
+export * from './Layouts/PrivateLayout/PrivateLayout';
 
 export * from './PrivateRoute';
 export * from './PublicRoute';
