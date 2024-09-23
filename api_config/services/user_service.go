@@ -24,7 +24,11 @@ func (service *UserService) GetById(id uint) (user *models.User) {
 }
 
 func (service *UserService) GetByEmail(emailValue string) (user *models.User) {
-	err := service.DBContext.First(&user, "email = ?", emailValue).Error
+	err := service.DBContext.Raw(
+		`SELECT * FROM USERS
+		WHERE EMAIL = ?
+		LIMIT 1`, emailValue).Scan(&user).Error
+	// err := service.DBContext.First(&user, "email = ?", emailValue).Error
 
 	if err != nil {
 		return nil
@@ -39,11 +43,13 @@ func (service *UserService) SearchUsersByNameTerm(name string) (users []models.U
 }
 
 func (service *UserService) CreateUser(userRegister *dto.UserRegister, admin bool) bool {
-	var existingUser *models.User
+	// var existingUser *models.User
 
-	err := service.DBContext.First(&existingUser, "email = ?", userRegister.Email).Error
+	var count int64
+	service.DBContext.Raw("SELECT COUNT(*) FROM USERS WHERE EMAIL = ?", userRegister.Email).Scan(&count)
+	// err := service.DBContext.First(&existingUser, "email = ?", userRegister.Email).Error
 
-	if err == nil {
+	if count > 0 {
 		return false
 	}
 

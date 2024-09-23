@@ -5,10 +5,12 @@ import (
 	"ArtistManager/api_config/models"
 	"ArtistManager/api_config/services"
 	"embed"
+	"runtime"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v2/pkg/options/linux"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
 	"gorm.io/gorm"
 )
@@ -18,6 +20,22 @@ var assets embed.FS
 
 func main() {
 	dbContext := models.Init("database.db3")
+
+	operatingSystem := runtime.GOOS
+	var bgColor options.RGBA
+
+	switch operatingSystem {
+	case "windows":
+		bgColor = options.RGBA{R: 0, G: 0, B: 0, A: 123}
+		break
+	case "linux":
+		bgColor = options.RGBA{R: 0, G: 0, B: 0, A: 255}
+		break
+	case "darwin":
+		bgColor = options.RGBA{R: 0, G: 0, B: 0, A: 123}
+		break
+	}
+
 	// Services
 	userService := services.UserService{DBContext: dbContext}
 	projectService := services.ProjectService{DBContext: dbContext}
@@ -44,7 +62,7 @@ func main() {
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 123},
+		BackgroundColour: &bgColor,
 		OnStartup:        app.startup,
 		Bind: []interface{}{
 			app,
@@ -55,6 +73,9 @@ func main() {
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
 			BackdropType:         windows.Tabbed,
+		},
+		Linux: &linux.Options{
+			WindowIsTranslucent: true,
 		},
 	})
 

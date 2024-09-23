@@ -16,7 +16,12 @@ type ProjectService struct {
 }
 
 func (service *ProjectService) GetById(projectId uint) (project *models.Project) {
-	err := service.DBContext.First(&project, "id = ?", projectId).Error
+	err := service.DBContext.Raw(`
+		SELECT * FROM PROJECTS
+		WHERE ID = ?
+		LIMIT 1`, projectId).Scan(&project).Error
+
+	// err := service.DBContext.First(&project, "id = ?", projectId).Error
 
 	if err != nil {
 		return nil
@@ -26,7 +31,18 @@ func (service *ProjectService) GetById(projectId uint) (project *models.Project)
 }
 
 func (service *ProjectService) SearchProjectsByName(name string) (projects []models.Project) {
-	service.DBContext.Where("name Like ?", fmt.Sprintf("%%%s%%", name)).Find(&projects)
+	service.DBContext.Raw(
+		`SELECT
+			ID,
+			NAME,
+			DESCRIPTION,
+			NUMBER_OF_TASKS,
+			ADVANCEMENT,
+			CREATED_AT,
+			ENDED_AT,
+			USER_ID
+		FROM PROJECTS
+		WHERE NAME LIKE ?`, fmt.Sprintf("%%%s%%", name)).Scan(&projects)
 	return projects
 }
 
@@ -38,6 +54,8 @@ func (service *ProjectService) GetFromUser(userId uint) []models.Project {
 }
 
 func (service *ProjectService) CreateProject(user *models.User, projectCreate *dto.ProjectCreate) string {
+
+	var err error
 
 	if len(projectCreate.Name) == 0 {
 		return "EMPTY_NAME"
@@ -54,7 +72,7 @@ func (service *ProjectService) CreateProject(user *models.User, projectCreate *d
 		project.Description.Valid = true
 	}
 
-	err := service.DBContext.Create(&project).Error
+	err = service.DBContext.Create(&project).Error
 
 	if err != nil {
 		fmt.Println(err)
@@ -106,6 +124,6 @@ func (service *ProjectService) DeleteProject(projectId uint) bool {
 		return false
 	}
 
-	service.DBContext.Delete(project)
+	service.DBContext.Delete(&project)
 	return true
 }

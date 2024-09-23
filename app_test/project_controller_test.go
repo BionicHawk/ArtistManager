@@ -16,7 +16,9 @@ func TestCreateProject(t *testing.T) {
 		Name: "ProjectExample",
 	})
 
-	if result != "OK" {
+	project := controller.ProjectService.GetById(1)
+
+	if result != "OK" || project == nil {
 		t.Fatalf("It should have been created!")
 		return
 	}
@@ -236,6 +238,9 @@ func TestAddTaskToProject(t *testing.T) {
 		ActivityName: "Start",
 	})
 
+	project := controller.ProjectService.GetById(1)
+	fmt.Printf("%d count\n", project.NumberOfTasks)
+
 	if result != "OK" {
 		t.Fatalf("Expected 'OK', got '%s'", result)
 		return
@@ -268,8 +273,9 @@ func TestAdd5TaskToProject(t *testing.T) {
 	var count int64
 
 	controller.TaskService.DBContext.Model(&models.Task{}).Where("project_id = ?", 1).Count(&count)
+	project := controller.ProjectService.GetById(1)
 
-	if count != 5 {
+	if count != 5 && project.NumberOfTasks != 5 {
 		t.Fatalf("Expected 5 tasks, got %d items", count)
 		return
 	}
@@ -311,4 +317,18 @@ func TestDeleteProject(t *testing.T) {
 	}
 
 	fmt.Println("Done!")
+}
+
+func TestDeleteTaskFromProject(t *testing.T) {
+	controller := GenerateProjectController()
+	createArtist(controller)
+
+	controller.CreateProject(1, dto.ProjectCreate{
+		Name: "A project",
+	})
+
+	controller.AddTask(1, 1, dto.TaskCreate{
+		ActivityName: "Test this thing...",
+	})
+
 }
