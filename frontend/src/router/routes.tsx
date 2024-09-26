@@ -1,25 +1,7 @@
 import { createBrowserRouter, Navigate, Outlet, useNavigate } from "react-router-dom";
 import { GeneralLayout, PrivateLayout, PrivateRoute, PublicLayout, PublicRoute } from "../components";
-import { LoginPage } from "../pages";
+import { Home, LoginPage, Profile, Projects, Settings, Users } from "../pages";
 import { useAuthStore, useUserStore } from "../store";
-
-
-const PrivatePageExample = () => {
-	const { logout } = useAuthStore();
-	const { user } = useUserStore();
-	const navigate = useNavigate();
-
-	return (
-		<div>
-			<h1 style={{ margin: 0, }}>Private Page</h1>
-			<> { console.log( { user } ) } </>
-			<button onClick={ () => {
-				logout();
-				navigate('/');
-			} }>Log out</button>
-		</div>
-	);
-};
 
 
 export const routes = createBrowserRouter([
@@ -37,13 +19,24 @@ export const routes = createBrowserRouter([
 				
 			},
 			{
-				path: "/layout",
-				element: <PublicRoute><PrivateLayout><PrivatePageExample /></PrivateLayout></PublicRoute>,
-				
+				path: "/home",
+				element: <PrivateRoute><PrivateLayout><Home /></PrivateLayout></PrivateRoute>,
 			},
 			{
-				path: "/home",
-				element: <PrivateRoute><PrivateLayout><PrivatePageExample /></PrivateLayout></PrivateRoute>,
+				path: "/projects",
+				element: <PrivateRoute><PrivateLayout><Projects /></PrivateLayout></PrivateRoute>,
+			},
+			{
+				path: "/users",
+				element: <PrivateRoute><PrivateLayout><Users /></PrivateLayout></PrivateRoute>,
+			},
+			{
+				path: "/profile",
+				element: <PrivateRoute><PrivateLayout><Profile /></PrivateLayout></PrivateRoute>,
+			},
+			{
+				path: "/settings",
+				element: <PrivateRoute><PrivateLayout><Settings /></PrivateLayout></PrivateRoute>,
 			},
 			{
 				path: "*",
