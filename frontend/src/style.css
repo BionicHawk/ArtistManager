@@ -24,6 +24,11 @@ body {
     min-height: 100vh;
 }
 
+hr {
+    border-color: rgba(255, 255, 255, 0.15);
+    margin: 0;
+}
+
 @font-face {
     font-family: "Nunito";
     font-style: normal;
