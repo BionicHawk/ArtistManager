@@ -27,13 +27,10 @@ func main() {
 	switch operatingSystem {
 	case "windows":
 		bgColor = options.RGBA{R: 0, G: 0, B: 0, A: 123}
-		break
 	case "linux":
 		bgColor = options.RGBA{R: 0, G: 0, B: 0, A: 255}
-		break
 	case "darwin":
 		bgColor = options.RGBA{R: 0, G: 0, B: 0, A: 123}
-		break
 	}
 
 	// Services
