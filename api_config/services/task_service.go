@@ -14,17 +14,6 @@ type TaskService struct {
 func (service *TaskService) GetById(taskId uint) *models.Task {
 	var task *models.Task
 	service.DBContext.First(&task, "id = ?", taskId)
-	service.DBContext.Raw(
-		`SELECT 
-			ID,
-			ACTIVITY_NAME,
-			DESCRIPTION,
-			STATUS,
-			CREATED_AT,
-			ENDED_AT,
-			PROJECT_ID
-		WHERE ID = ?
-		LIMIT 1`, taskId).Scan(&task)
 
 	if task.ID == 0 {
 		return nil
@@ -48,11 +37,6 @@ func (service *TaskService) CreateTask(project *models.Project, taskCreate *dto.
 		return false
 	}
 
-	// service.DBContext.Exec(
-	// 	`UPDATE PROJECTS
-	// 	SET NUMBER_OF_TASKS = (SELECT COUNT(*)
-	// 		FROM TASKS AS T WHERE T.PROJECT_ID = ?)
-	// 	WHERE ID = ?`, project.ID, project.ID)
 	UpdateProjectTasksCount(project.ID, service.DBContext)
 
 	return true
@@ -72,8 +56,6 @@ func (service *TaskService) DeleteTask(project *models.Project, taskId uint) boo
 			SET NUMBER_OF_TASKS = (SELECT COUNT(*)
 				FROM TASKS AS T WHERE T.PROJECT_ID = ?)
 		WHERE ID = ?`, project.ID, project.ID)
-
-	// service.DBContext.Model(project).Update("number_of_tasks", project.NumberOfTasks-1)
 
 	return true
 }

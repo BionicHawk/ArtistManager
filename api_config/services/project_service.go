@@ -16,12 +16,7 @@ type ProjectService struct {
 }
 
 func (service *ProjectService) GetById(projectId uint) (project *models.Project) {
-	err := service.DBContext.Raw(`
-		SELECT * FROM PROJECTS
-		WHERE ID = ?
-		LIMIT 1`, projectId).Scan(&project).Error
-
-	// err := service.DBContext.First(&project, "id = ?", projectId).Error
+	err := service.DBContext.First(&project, "id = ?", projectId).Error
 
 	if err != nil {
 		return nil
