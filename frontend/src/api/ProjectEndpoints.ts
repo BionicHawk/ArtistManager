@@ -1,4 +1,4 @@
-import ProjectController from "../../wailsjs/go/controllers/ProjectController"
+import * as ProjectController from "../../wailsjs/go/controllers/ProjectController"
 import { dto, models } from "../../wailsjs/go/models";
 
 export default class ProjectEndpoints {
@@ -66,6 +66,17 @@ export default class ProjectEndpoints {
 
         return result;
     } 
+
+    public async GetById(projectId: number): Promise<dto.ProjectDtoOut | null> {
+        let project: dto.ProjectDtoOut | null = null;
+
+        await ProjectController.GetById(projectId)
+            .then(projectResult => {
+                project = projectResult;
+            })
+
+        return project;
+    }
     
     /**
      * Get all projects from referenced User
@@ -80,6 +91,16 @@ export default class ProjectEndpoints {
             })
 
         return projects;
+    }
+
+    public async GetProjectWithUser(projectId: number): Promise<dto.UserProjectDtoOut | null> {
+        const project = await ProjectController.GetWithUserById(projectId);
+
+        if (!project) {
+            return null;
+        }
+        
+        return project;
     }
 
     /**

@@ -14,7 +14,7 @@ export const LoginPage = () => {
 
   return (
 		<div className={ styles.loginContainer } >
-			<Container className={ styles.formContainer }>
+			<Container className={ styles.formContainer + ' emergable'}>
 				<div className={`${styles.slideContainer} ${ typeForm === 'LOGIN' ? styles.slideRight : styles.slideLeft }`}>
 						<Login handleChangeTypeForm={handleChangeTypeForm} />
 						<Register handleChangeTypeForm={handleChangeTypeForm} />

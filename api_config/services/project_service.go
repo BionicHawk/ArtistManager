@@ -48,6 +48,35 @@ func (service *ProjectService) GetFromUser(userId uint) []models.Project {
 	return projects
 }
 
+func (service *ProjectService) GetUserProject(projectId uint) *dto.UserProjectDtoOut {
+	var project *models.Project
+	var user *models.User
+
+	service.DBContext.First(&project, "id = ?", projectId)
+
+	if project == nil {
+		return nil
+	}
+
+	service.DBContext.First(&user, "id = ?", project.UserID)
+
+	if user == nil {
+		return nil
+	}
+
+	return &dto.UserProjectDtoOut{
+		ID:            project.ID,
+		Name:          project.Name,
+		Description:   &project.Description.String,
+		NumberOfTasks: project.NumberOfTasks,
+		Advancement:   project.Advancement,
+		CreatedAt:     project.CreatedAt,
+		EndedAt:       &project.EndedAt.Time,
+		UserId:        project.UserID,
+		User:          user.Name,
+	}
+}
+
 func (service *ProjectService) CreateProject(user *models.User, projectCreate *dto.ProjectCreate) string {
 
 	var err error

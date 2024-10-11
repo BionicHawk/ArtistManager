@@ -4,6 +4,7 @@ import (
 	"ArtistManager/api_config/controllers"
 	"ArtistManager/api_config/models/dto"
 	"fmt"
+	"os"
 	"testing"
 )
 
@@ -272,6 +273,27 @@ func TestSearchUsersWithNoResults(t *testing.T) {
 		return
 	}
 	fmt.Println("Done!")
+
+}
+
+func TestUpdateProfilePicture(t *testing.T) {
+	controller := GenerateUserController()
+
+	createUser(controller, false)
+
+	image, err := os.ReadFile("./assets/foto-perfil-prueba.jpg")
+
+	if err != nil {
+		t.Fatalf("Error reading file: %s", err)
+		return
+	}
+
+	result := controller.ChangeProfilePic(1, image)
+
+	if result == false {
+		t.Fatalf("Profile picture should have been updated")
+		return
+	}
 
 }
 
