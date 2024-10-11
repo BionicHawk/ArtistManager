@@ -26,11 +26,11 @@ func main() {
 
 	switch operatingSystem {
 	case "windows":
-		bgColor = options.RGBA{R: 0, G: 0, B: 0, A: 123}
+		bgColor = options.RGBA{R: 0, G: 0, B: 0, A: 0}
 	case "linux":
 		bgColor = options.RGBA{R: 0, G: 0, B: 0, A: 255}
 	case "darwin":
-		bgColor = options.RGBA{R: 0, G: 0, B: 0, A: 123}
+		bgColor = options.RGBA{R: 0, G: 0, B: 0, A: 0}
 	}
 
 	// Services
@@ -67,7 +67,7 @@ func main() {
 		Windows: &windows.Options{
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
-			BackdropType:         windows.Tabbed,
+			BackdropType:         windows.Acrylic,
 		},
 		Linux: &linux.Options{
 			WindowIsTranslucent: true,
