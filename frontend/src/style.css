@@ -29,6 +29,21 @@ hr {
     margin: 0;
 }
 
+.emergable {
+    animation: emergable 0.3s ease-in;
+}
+
+@keyframes emergable {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
 @font-face {
     font-family: "Nunito";
     font-style: normal;

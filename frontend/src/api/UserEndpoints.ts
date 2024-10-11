@@ -165,6 +165,22 @@ export default class UserEndpoints {
         return users;
     }
 
+    public async UpdateUserImage(userId: number, image: File) {
+        const fileReader = new FileReader();
+
+        const bytes = await new Promise<Uint8Array>((resolve, reject) => {
+            fileReader.onload = (event) => {
+                resolve(new Uint8Array(event.target?.result as ArrayBuffer));
+            };
+            fileReader.onerror = reject;
+    
+            fileReader.readAsArrayBuffer(image);
+        });
+
+        // @ts-ignore
+        return await UserController.ChangeProfilePic(userId, bytes);
+    }
+
 }
 
 export enum ChangePasswordResult {

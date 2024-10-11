@@ -1,0 +1,8 @@
+.SurroundingBox {
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    padding-right: 4px;
+    margin: 8px;
+    width: 110px;
+}

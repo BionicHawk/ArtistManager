@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate, Outlet, useNavigate } from "react-router
 import { GeneralLayout, PrivateLayout, PrivateRoute, PublicLayout, PublicRoute } from "../components";
 import { Home, LoginPage, Profile, Projects, Settings, Users } from "../pages";
 import { useAuthStore, useUserStore } from "../store";
+import Project from "../pages/ProjectPage/Project";
 
 
 export const routes = createBrowserRouter([
@@ -25,6 +26,10 @@ export const routes = createBrowserRouter([
 			{
 				path: "/projects",
 				element: <PrivateRoute><PrivateLayout><Projects /></PrivateLayout></PrivateRoute>,
+			},
+			{
+				path: "/project/:id",
+				element: <PrivateRoute><PrivateLayout><Project /></PrivateLayout></PrivateRoute>,
 			},
 			{
 				path: "/users",

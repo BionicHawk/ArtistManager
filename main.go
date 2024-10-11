@@ -34,17 +34,17 @@ func main() {
 	}
 
 	// Services
-	userService := services.UserService{DBContext: dbContext}
-	projectService := services.ProjectService{DBContext: dbContext}
-	taskService := services.TaskService{DBContext: dbContext}
+	// userService := services.UserService{DBContext: dbContext}
+	// projectService := services.ProjectService{DBContext: dbContext}
+	// taskService := services.TaskService{DBContext: dbContext}
 
-	// Controllers
-	userController := controllers.UserController{UserService: &userService}
-	projectController := controllers.ProjectController{
-		ProjectService: &projectService,
-		UserService:    &userService,
-		TaskService:    &taskService,
-	}
+	// // Controllers
+	// userController := controllers.UserController{UserService: &userService}
+	// projectController := controllers.ProjectController{
+	// 	ProjectService: &projectService,
+	// 	UserService:    &userService,
+	// 	TaskService:    &taskService,
+	// }
 
 	// Create an instance of the app structure
 	app := NewApp()
@@ -61,11 +61,9 @@ func main() {
 		},
 		BackgroundColour: &bgColor,
 		OnStartup:        app.startup,
-		Bind: []interface{}{
+		Bind: append([]interface{}{
 			app,
-			&userController,
-			&projectController,
-		},
+		}, ScopeServices(dbContext)...),
 		Windows: &windows.Options{
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
@@ -81,6 +79,17 @@ func main() {
 	}
 }
 
-func ScopeServices(database *gorm.DB) {
+func ScopeServices(database *gorm.DB) []interface{} {
+	userService := services.UserService{DBContext: database}
+	projectService := services.ProjectService{DBContext: database}
+	taskService := services.TaskService{DBContext: database}
 
+	return []interface{}{
+		&controllers.UserController{UserService: &userService},
+		&controllers.ProjectController{
+			UserService:    &userService,
+			ProjectService: &projectService,
+			TaskService:    &taskService,
+		},
+	}
 }

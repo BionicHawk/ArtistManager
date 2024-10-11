@@ -1,0 +1,28 @@
+.header {
+    display: grid;
+    grid-template-columns: 70px 1fr 70px;
+    align-items: center;
+}
+
+.link {
+    text-decoration: none;
+    color: white;
+}
+
+.link:visited {
+    text-decoration: none;
+}
+
+.contentLayout {
+    margin: 0 8vw;
+}
+
+.statusbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #20202080;
+    border-radius: 8px;
+    padding-left: 8px;
+    box-shadow: inset 0px 0px 10px rgba(0,0,0,0.5);
+}

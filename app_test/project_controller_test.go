@@ -97,6 +97,23 @@ func TestCreateProjectWithEmptyDescription(t *testing.T) {
 	fmt.Println("Done!")
 }
 
+func TestGetWithUser(t *testing.T) {
+	controller := GenerateProjectController()
+	createArtist(controller)
+
+	project := dto.ProjectCreate{
+		Name: "A project",
+	}
+
+	controller.CreateProject(1, project)
+	createdProject := controller.GetWithUserById(1)
+
+	if createdProject == nil {
+		t.Fatalf("Expected a project, got nil")
+		return
+	}
+}
+
 func TestSearchProjects(t *testing.T) {
 	term := "Project"
 	controller := GenerateProjectController()

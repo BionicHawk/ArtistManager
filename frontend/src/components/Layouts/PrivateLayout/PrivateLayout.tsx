@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { Container } from '../..';
 import styles from './PrivateLayout.module.css';
 import { ButtonBase, Divider, Icon, IconButton, ListItemIcon, Menu, MenuItem } from '@mui/material';
-import { AccountCircle, Home, Info, Logout, MoreVert, Person, RocketLaunch, Settings } from '@mui/icons-material';
+import { AccountCircle, Home, Info, Logout, MoreVert, Person, RocketLaunch, Settings, StickyNote2 } from '@mui/icons-material';
 import { useAuthStore, useUserStore } from '../../../store';
 import { useState } from 'react';
 
@@ -22,7 +22,7 @@ export const PrivateLayout = ({ children }: PrivateLayoutProps) => {
 	return (
 		<div className={ styles.layout }>
 			
-			<main className={ styles.main }>
+			<main className={ styles.main + ' emergable'}>
 				<Container style={{ borderRadius: 16, height: '100%', width: '100%', }}>
 					{ children }
 				</Container>
@@ -30,7 +30,7 @@ export const PrivateLayout = ({ children }: PrivateLayoutProps) => {
 			</main>
 
 			{/* Menú lateral */}
-			<aside className={ styles.aside }>
+			<aside className={ styles.aside + ' emergable'}>
 				<Container style={{ borderRadius: 16, height: '100%' }} className={ styles.aside_content }>
 					<div className={ styles.menu_options_container }>
 							<ButtonBase className={ styles.menu_option }>

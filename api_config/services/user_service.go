@@ -4,7 +4,6 @@ import (
 	"ArtistManager/api_config/models"
 	"ArtistManager/api_config/models/dto"
 	"fmt"
-	"os"
 
 	"gorm.io/gorm"
 )
@@ -71,7 +70,7 @@ func (service *UserService) CreateUser(userRegister *dto.UserRegister, admin boo
 	return service.DBContext.Create(&user).Error == nil
 }
 
-func (service *UserService) UpdateProfilePicture(userId uint, file os.File) bool {
+func (service *UserService) UpdateProfilePicture(userId uint, blob []byte) bool {
 	var user *models.User
 
 	service.DBContext.First(&user, userId)
@@ -80,17 +79,8 @@ func (service *UserService) UpdateProfilePicture(userId uint, file os.File) bool
 		return false
 	}
 
-	data := []byte{}
-	_, err := file.Read(data)
-
-	if err != nil {
-		return false
-	}
-
-	user.ProfilePic = &data
-
-	service.DBContext.Update("profile_pic", &user)
-	return true
+	errDb := service.DBContext.Model(&user).Update("profile_pic", blob).Error
+	return errDb == nil
 }
 
 func (service *UserService) CreateDtoOut(user *models.User) dto.UserDtoOut {

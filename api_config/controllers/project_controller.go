@@ -4,6 +4,7 @@ import (
 	"ArtistManager/api_config/models"
 	"ArtistManager/api_config/models/dto"
 	"ArtistManager/api_config/services"
+	"time"
 )
 
 type ProjectController struct {
@@ -20,6 +21,37 @@ func (controller *ProjectController) CreateProject(userId uint, projectCreate dt
 	}
 
 	return controller.ProjectService.CreateProject(user, &projectCreate)
+}
+
+func (controller *ProjectController) GetById(projectId uint) *dto.ProjectDtoOut {
+	project := controller.ProjectService.GetById(projectId)
+	var description *string
+	var endedAt *time.Time
+
+	if project == nil {
+		return nil
+	}
+
+	if project.Description.Valid {
+		description = &project.Description.String
+	}
+
+	if project.EndedAt.Valid {
+		endedAt = &project.EndedAt.Time
+	}
+
+	return &dto.ProjectDtoOut{
+		ID:          project.ID,
+		Name:        project.Name,
+		Description: description,
+		Tasks:       []dto.TaskDtoOut{},
+		CreatedAt:   project.CreatedAt,
+		EndedAt:     endedAt,
+	}
+}
+
+func (controller *ProjectController) GetWithUserById(projectId uint) *dto.UserProjectDtoOut {
+	return controller.ProjectService.GetUserProject(projectId)
 }
 
 func (controller *ProjectController) AddTask(userId uint, projectId uint, taskCreate dto.TaskCreate) string {

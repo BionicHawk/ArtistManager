@@ -11,8 +11,12 @@ export function DeleteProject(arg1:number,arg2:number):Promise<string>;
 
 export function DeleteTask(arg1:number,arg2:number):Promise<string>;
 
+export function GetById(arg1:number):Promise<dto.ProjectDtoOut>;
+
 export function GetFromUser(arg1:number):Promise<Array<models.Project>>;
 
 export function GetProjectsBySearchName(arg1:string):Promise<Array<models.Project>>;
+
+export function GetWithUserById(arg1:number):Promise<dto.UserProjectDtoOut>;
 
 export function MarkAsDone(arg1:number,arg2:number):Promise<string>;

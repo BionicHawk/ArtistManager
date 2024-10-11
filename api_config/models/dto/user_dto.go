@@ -14,6 +14,18 @@ type UserDtoOut struct {
 	CreatedAt  time.Time       `json:"createdAt"`
 }
 
+type UserProjectDtoOut struct {
+	ID            uint       `json:"id"`
+	Name          string     `json:"name"`
+	Description   *string    `json:"description"`
+	NumberOfTasks uint       `json:"numberOfTasks"`
+	Advancement   float64    `json:"advancement"`
+	CreatedAt     time.Time  `json:"createdAt"`
+	EndedAt       *time.Time `json:"endedAt"`
+	UserId        uint       `json:"userId"`
+	User          string     `json:"user"`
+}
+
 type UserLogin struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`

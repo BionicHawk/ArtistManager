@@ -3,7 +3,6 @@ package controllers
 import (
 	"ArtistManager/api_config/models/dto"
 	"ArtistManager/api_config/services"
-	"os"
 )
 
 type UserController struct {
@@ -72,7 +71,7 @@ func (controller *UserController) ChangePassword(userId uint, oldPassword string
 	return controller.UserService.UpdatePassword(user, newPassword)
 }
 
-func (controller *UserController) ChangeProfilePic(userId uint, image os.File) bool {
+func (controller *UserController) ChangeProfilePic(userId uint, image []byte) bool {
 	return controller.UserService.UpdateProfilePicture(userId, image)
 }
 
