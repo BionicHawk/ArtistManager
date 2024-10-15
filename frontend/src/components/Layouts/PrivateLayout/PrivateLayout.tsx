@@ -5,6 +5,7 @@ import { ButtonBase, Divider, Icon, IconButton, ListItemIcon, Menu, MenuItem } f
 import { AccountCircle, Home, Info, Logout, MoreVert, Person, RocketLaunch, Settings, StickyNote2 } from '@mui/icons-material';
 import { useAuthStore, useUserStore } from '../../../store';
 import { useState } from 'react';
+import AssetImage from '../../AssetImage/AssetImage';
 
 interface PrivateLayoutProps {
 	children: React.ReactNode | React.ReactNode[];
@@ -56,9 +57,10 @@ export const PrivateLayout = ({ children }: PrivateLayoutProps) => {
 						<hr />
 						<div className={ styles.profile_container }>
 							<NavLink to='/profile' className={ styles.user_profile }>
-								<Icon sx={{ fontSize: '2rem', }}>
+								<AssetImage bytes={user?.profilePic?.toString()}/>
+								{/* <Icon sx={{ fontSize: '2rem', }}>
 								{ user?.profilePic || <AccountCircle style={{ fontSize: 'inherit' }} /> }
-								</Icon>
+								</Icon> */}
 								<span className={ styles.user_name }>{ user?.name || '-' }</span>
 							</NavLink>
 							<IconButton onClick={ handleMoreClick }><MoreVert /></IconButton>

@@ -12,6 +12,7 @@ type UserDtoOut struct {
 	Projects   []ProjectDtoOut `json:"projects"`
 	Role       string          `json:"role"`
 	CreatedAt  time.Time       `json:"createdAt"`
+	Active     bool            `json:"active"`
 }
 
 type UserProjectDtoOut struct {

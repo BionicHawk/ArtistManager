@@ -77,6 +77,14 @@
   gap: 4px;
   color: inherit;
   text-decoration: none;
+
+  img {
+    width: 6dvh;
+    height: 6dvh;
+    border-radius: 50%;
+    border: 4px solid rgb(128, 55, 211);
+    aspect-ratio: 1/1;
+  }
 }
 
 .user_name { 

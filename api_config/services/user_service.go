@@ -127,6 +127,7 @@ func (service *UserService) CreateDtoOut(user *models.User) dto.UserDtoOut {
 		Projects:   projectOuts,
 		Role:       user.Role,
 		CreatedAt:  user.CreatedAt,
+		Active:     user.Active,
 	}
 }
 
