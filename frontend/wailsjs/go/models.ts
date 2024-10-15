@@ -122,6 +122,7 @@ export namespace dto {
 	    role: string;
 	    // Go type: time
 	    createdAt: any;
+	    active: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new UserDtoOut(source);
@@ -136,6 +137,7 @@ export namespace dto {
 	        this.projects = this.convertValues(source["projects"], ProjectDtoOut);
 	        this.role = source["role"];
 	        this.createdAt = this.convertValues(source["createdAt"], null);
+	        this.active = source["active"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

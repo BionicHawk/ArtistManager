@@ -13,4 +13,5 @@ type User struct {
 	Projects   []Project
 	Role       string `gorm:"check:role_checker, role = 'ADMIN' or role = 'ARTIST'"`
 	CreatedAt  time.Time
+	Active     bool `gorm:"default:true"`
 }

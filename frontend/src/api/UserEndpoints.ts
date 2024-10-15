@@ -160,25 +160,37 @@ export default class UserEndpoints {
         await UserController.SearchByName(nameTerm)
             .then(results => {
                 users = [...users, ...results]
-            })
+            }) 
 
         return users;
     }
 
-    public async UpdateUserImage(userId: number, image: File) {
+    public async UpdateUserImage(userId: number, image: File): Promise<string | null> {
         const fileReader = new FileReader();
 
-        const bytes = await new Promise<Uint8Array>((resolve, reject) => {
-            fileReader.onload = (event) => {
-                resolve(new Uint8Array(event.target?.result as ArrayBuffer));
-            };
-            fileReader.onerror = reject;
+        try {
+            const bytes = await new Promise<Uint8Array>((resolve, reject) => {
+                fileReader.onload = (event) => {
+                    resolve(new Uint8Array(event.target?.result as ArrayBuffer));
+                };
+                fileReader.onerror = reject;
+        
+                fileReader.readAsArrayBuffer(image);
+            });
     
-            fileReader.readAsArrayBuffer(image);
-        });
+            let byteArray: Array<number> = [];
 
-        // @ts-ignore
-        return await UserController.ChangeProfilePic(userId, bytes);
+            for (let i = 0; i < bytes.length; ++i) {
+                byteArray.push(bytes[i]);
+            }
+    
+            const result = await UserController.ChangeProfilePic(userId, byteArray);
+
+            return result? byteArray.toString() : null;
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
     }
 
 }
