@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Container } from '../..';
+import { Container, CustomScroll } from '../..';
 import styles from './PrivateLayout.module.css';
 import { ButtonBase, Divider, Icon, IconButton, ListItemIcon, Menu, MenuItem } from '@mui/material';
 import { AccountCircle, Home, Info, Logout, MoreVert, Person, RocketLaunch, Settings, StickyNote2 } from '@mui/icons-material';
@@ -24,15 +24,17 @@ export const PrivateLayout = ({ children }: PrivateLayoutProps) => {
 		<div className={ styles.layout }>
 			
 			<main className={ styles.main + ' emergable'}>
-				<Container style={{ borderRadius: 16, height: '100%', width: '100%', }}>
-					{ children }
+				<Container style={{ height: 'calc(100% - 32px)', width: '100%', padding: '16px 0', overflow: 'hidden', }}>
+					<CustomScroll>
+						{ children }
+					</CustomScroll>
 				</Container>
 
 			</main>
 
 			{/* Menú lateral */}
 			<aside className={ styles.aside + ' emergable'}>
-				<Container style={{ borderRadius: 16, height: '100%' }} className={ styles.aside_content }>
+				<Container style={{ padding: '8px 0', height: 'calc(100% - 16px)' }} className={ styles.aside_content }>
 					<div className={ styles.menu_options_container }>
 							<ButtonBase className={ styles.menu_option }>
 								<NavLink to='/home'>

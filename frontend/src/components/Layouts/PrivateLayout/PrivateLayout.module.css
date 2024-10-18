@@ -41,7 +41,7 @@
 }
 
 .menu_options_container {
-  padding: 8px 0;
+  /* padding: 8px 0 !important; */
   display: flex;
   flex-direction: column;
 }

@@ -6,9 +6,9 @@ interface ContainerProps {
 	style?:			React.CSSProperties;
 }
 
-export const Container = ({ children, className, style }: ContainerProps) => {
+export const Container = ({ children, className, style, }: ContainerProps) => {
 	return (
-		<div className={ className } style={{ ...containerStyles, ...style }}>
+		<div className={ className } style={{ ...containerStyles, ...style }}>			
 			{ children }
 		</div>
 	)
@@ -17,4 +17,5 @@ export const Container = ({ children, className, style }: ContainerProps) => {
 const containerStyles: React.CSSProperties = {
 	backgroundColor: 'rgba(255, 255, 255, 0.15)',
 	borderRadius: 24,
+	padding: 16,
 };

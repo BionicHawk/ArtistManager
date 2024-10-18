@@ -3,21 +3,19 @@ import { createTheme } from "@mui/material";
 export const theme = createTheme({
 		components: {
 			MuiButton: {
-				styleOverrides: {
-					root: {
-						color: '#261E40',
-						fontWeight: '600',
-					},
-				},
 				variants: [
 					{
-						props: {},
+						props: {
+							variant: 'contained'
+						},
 						style: {
+							color: '#261E40',
+							fontWeight: '600',
 							":hover": {
 								backgroundColor: 'rgb(158 138 223)',
 							},
 						}
-					}
+					},
 				],	
 			},
 			// MuiTextField: {
@@ -33,6 +31,7 @@ export const theme = createTheme({
 			},
 			secondary: {
 				main: '#ff76a4',
+
 			},
 			background: {
 				default: '#242424',
