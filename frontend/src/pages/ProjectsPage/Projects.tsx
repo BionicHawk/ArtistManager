@@ -1,86 +1,51 @@
-import { Circle } from "@mui/icons-material"
-import { Button, Card, CardActionArea, CardContent, CircularProgress, Container, Icon, Typography } from "@mui/material"
-import { CSSProperties, useEffect, useState } from "react"
-import { dto, models } from "../../../wailsjs/go/models"
-import { Link } from "react-router-dom"
-import { useUserStore } from "../../store/useUserStore"
-import ProjectEndpoints from "../../api/ProjectEndpoints"
-import ProgressIndicatorTag from "../../components/ProgressIndicatorTag/ProgressIndicatorTag"
+import { Add, KeyboardArrowDown, Settings, } from "@mui/icons-material"
+import { Button, Collapse, IconButton, LinearProgress, TextField } from "@mui/material"
+import { Project } from "../../interfaces"
+import { ProjectCard } from "../../components"
+
+// Datos de ejemplo
+const projects: Project[] = [
+  {
+    id: 1,
+    name: "Proyecto A",
+    description: "Este es un proyecto de ejemplo con una descripción que no excede los 500 caracteres.",
+    taskCount: 10,
+    progress: 75,
+    createdAt: "2023-01-15",
+    completedAt: null,
+    assignedUser: "Juan Pérez",
+    tasks: ["Tarea 1", "Tarea 2", "Tarea 3"]
+  },
+  {
+    id: 2,
+    name: "Proyecto B",
+    description: "Otro proyecto de ejemplo con una descripción corta.",
+    taskCount: 5,
+    progress: 100,
+    createdAt: "2023-02-20",
+    completedAt: "2023-05-10",
+    assignedUser: "María García",
+    tasks: ["Tarea 1", "Tarea 2"]
+  },
+  // Añade más proyectos aquí...
+]
+
 
 export const Projects = () => {
-	const [loading, setLoading] = useState(true);
-	const [projects, setProjects] = useState<models.Project[]>([]);
-	const { user } = useUserStore();
-
-	const projectEndpoints = new ProjectEndpoints();
-
-	function ProjectsHeader() {
-		return <div>
-			<h2>Proyectos</h2>
-		</div>
-	}
-
-	useEffect(() => {
-		if (!user) {
-			return;
-		}
-		projectEndpoints.GetFromUser(user.id)
-			.then(projects => {
-				setProjects(projects);
-				setLoading(false);
-
-			})
-			.catch(err => {
-				console.error(err);
-			})
-	}, [])
-
-	if (loading) {
-		return <div>
-			<CircularProgress />
-		</div>
-	}
-
 	return (
-		<div style={pageStyles}>
-			<ProjectsHeader />
-			<div style={projectsContainerStyles}>
-				{projects.map(project => (<ProjectItem key={project.id} project={project} />))}
+		<>
+			<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: 32, alignItems: 'center', }}>
+				<h1 className='title'>Proyectos</h1>
+				<Button variant='contained' size='small' startIcon={<Add />}>Crear</Button>
 			</div>
-		</div>
+
+			<br />
+
+			<div style={{ display: 'flex', gap: 16, flexDirection: 'column', }}>
+				{ projects.map( project => (
+					<ProjectCard key={ project.id } project={ project } />
+				) ) }
+			</div>
+		</>
 	)
-}
-
-function ProjectItem({project}: {project: models.Project}) {
-	const description = project.description.String ?? "";
-
-	return <Card className='emergable' sx={{width: '100%', backgroundColor: '#404040'}}
-		variant="elevation" elevation={8}>
-		<CardContent>
-			<Typography variant="h5">{project.name}</Typography>
-			<Typography variant="body2" paddingY={1.5} align="left">{description}</Typography>
-			<ProgressIndicatorTag progressType={project.endedAt.Valid ? 'Terminado' : 'Pendiente' }/>
-		</CardContent>
-		<CardActionArea>
-			<Link to={`/project/${project.id}`}>
-				<Typography variant="overline" color="textSecondary">Ver más</Typography>
-			</Link>
-		</CardActionArea>
-	</Card>
-}
-
-const pageStyles: CSSProperties = {
-	display: 'grid', 
-	gridTemplateRows: 'auto 1fr', 
-	height: '100%'
-}
-
-const projectsContainerStyles: CSSProperties = {
-	display: 'flex',
-	flexDirection: 'column',
-	flexWrap: 'wrap',
-	alignItems: 'center',
-	margin: '8px',
-	flexGrow: 1,
-	overflowY: 'auto',
 }
