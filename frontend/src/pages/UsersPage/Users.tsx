@@ -31,7 +31,6 @@ export const Users = () => {
 			<UsersTable />
 
 			<Modal open={ showCreateUserModal } handleClose={ toggleCreateUserModal } title='Crear usuario'>
-				{/* <h1>Modal</h1> */}
 				<form style={{ 
 					display: 'flex', 
 					flexDirection: 'column', 

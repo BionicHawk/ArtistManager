@@ -18,6 +18,10 @@ export function DeleteTask(arg1, arg2) {
   return window['go']['controllers']['ProjectController']['DeleteTask'](arg1, arg2);
 }
 
+export function GetAllProjects() {
+  return window['go']['controllers']['ProjectController']['GetAllProjects']();
+}
+
 export function GetById(arg1) {
   return window['go']['controllers']['ProjectController']['GetById'](arg1);
 }

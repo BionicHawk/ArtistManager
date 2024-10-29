@@ -151,3 +151,10 @@ func (service *ProjectService) DeleteProject(projectId uint) bool {
 	service.DBContext.Delete(&project)
 	return true
 }
+
+func (service *ProjectService) GetAllProjects() []models.Project {
+	projects := []models.Project{}
+	service.DBContext.Find(&projects)
+
+	return projects
+}

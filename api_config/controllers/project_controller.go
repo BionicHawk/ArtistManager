@@ -148,3 +148,7 @@ func (controller *ProjectController) DeleteTask(projectId uint, taskId uint) str
 
 	return "OK"
 }
+
+func (controller *ProjectController) GetAllProjects() []models.Project {
+	return controller.ProjectService.GetAllProjects()
+}

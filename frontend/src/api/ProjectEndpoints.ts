@@ -146,6 +146,16 @@ export default class ProjectEndpoints {
         return result;
     }
 
+    public async GetAllProjects(): Promise<Array<models.Project>> {
+        let projects: Array<models.Project> = [];
+
+        await ProjectController.GetAllProjects()
+            .then(projectsResult => {
+                projects = [...projects, ...projectsResult];
+            })
+
+        return projects;
+    }
 }
 
 export enum CreateProjectResult {

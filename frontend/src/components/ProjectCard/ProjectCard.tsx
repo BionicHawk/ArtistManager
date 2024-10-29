@@ -10,6 +10,8 @@ interface ProjectCardProps {
 export const ProjectCard = ({ project }: ProjectCardProps) => {
 	const [showTasks, setShowTasks] = useState( false );
 
+	console.log({ project })
+
 	const handleToggleShowTasks = () => {
 		setShowTasks( !showTasks );
 	}

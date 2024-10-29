@@ -2,6 +2,7 @@ import { ChangeEvent, useState } from 'react';
 import { Avatar, IconButton, Menu, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Tooltip } from '@mui/material';
 import { Cancel, DeleteOutlined, EditOutlined, Launch, Person, Save } from '@mui/icons-material';
 import * as colors from '@mui/material/colors';
+import UserEndpoints from '../../api/UserEndpoints';
 
 
 // TODO: Remover esta importación
@@ -53,6 +54,9 @@ const UserActions = ({ onVisitUser, onEditRow, onDeleteRow }: UserActionsProps) 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
+  
+  const userEndpoints = new UserEndpoints();
+
 
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -61,6 +65,8 @@ const UserActions = ({ onVisitUser, onEditRow, onDeleteRow }: UserActionsProps) 
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  console.log({ userEndpoints })
 
   return (
     <span>
