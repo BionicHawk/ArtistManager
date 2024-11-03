@@ -13,14 +13,24 @@ type ProjectController struct {
 	TaskService    *services.TaskService
 }
 
-func (controller *ProjectController) CreateProject(userId uint, projectCreate dto.ProjectCreate) string {
+// func (controller *ProjectController) CreateProject(userId uint, projectCreate dto.ProjectCreate) string {
+// 	user := controller.UserService.GetById(userId)
+
+// 	if user == nil {
+// 		return "USER_NOT_FOUND"
+// 	}
+
+//		return controller.ProjectService.CreateProject(user, &projectCreate)
+//	}
+func (controller *ProjectController) CreateProject(userId uint, projectCreate dto.ProjectCreate) dto.CreateProjectResponse {
 	user := controller.UserService.GetById(userId)
 
 	if user == nil {
-		return "USER_NOT_FOUND"
+		return dto.CreateProjectResponse{Result: "USER_NOT_FOUND", ProjectID: 0}
 	}
 
-	return controller.ProjectService.CreateProject(user, &projectCreate)
+	result, projectId := controller.ProjectService.CreateProject(user, &projectCreate)
+	return dto.CreateProjectResponse{Result: result, ProjectID: projectId}
 }
 
 func (controller *ProjectController) GetById(projectId uint) *dto.ProjectDtoOut {
@@ -76,13 +86,7 @@ func (controller *ProjectController) AddTask(userId uint, projectId uint, taskCr
 	return "OK"
 }
 
-func (controller *ProjectController) DeleteProject(userId uint, projectId uint) string {
-	user := controller.UserService.GetById(userId)
-
-	if user == nil {
-		return "USER_NOT_FOUND"
-	}
-
+func (controller *ProjectController) DeleteProject(projectId uint) string {
 	deletionTaskResutl := controller.TaskService.DeleteAllFromProject(projectId)
 
 	if !deletionTaskResutl {
@@ -147,4 +151,45 @@ func (controller *ProjectController) DeleteTask(projectId uint, taskId uint) str
 	}
 
 	return "OK"
+}
+
+func (controller *ProjectController) GetAllProjects() []models.Project {
+	return controller.ProjectService.GetAllProjects()
+}
+
+func (controller *ProjectController) GetProjectTasks(projectId uint) []models.Task {
+	return controller.ProjectService.GetProjectTasks(projectId)
+}
+
+func (controller *ProjectController) UpdateProject(userId uint, projectUpdate dto.UpdateProject) string {
+	project := controller.ProjectService.GetById(projectUpdate.ProjectID)
+	user := controller.UserService.GetById(userId)
+
+	if project == nil {
+		return "PROJECT_NOT_FOUND"
+	}
+
+	if user == nil {
+		return "USER_NOT_FOUND"
+	}
+
+	result := controller.ProjectService.UpdateProject(user, project, projectUpdate.Name, projectUpdate.Description)
+
+	if !result {
+		return "COULD_NOT_UPDATE_PROJECT"
+	}
+
+	return "OK"
+}
+
+func (controller *ProjectController) UpdateTask(taskId uint, activityName string) bool {
+	result := false
+
+	result = controller.ProjectService.UpdateTask(taskId, activityName)
+
+	return result
+}
+
+func (controller *ProjectController) CompleteTask(taskId uint) *models.Project {
+	return controller.ProjectService.CompleteTask(taskId)
 }

@@ -1,13 +1,13 @@
-import { ChangeEvent, ChangeEventHandler, useState } from 'react';
-import { Avatar, IconButton, Menu, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Tooltip } from '@mui/material';
-import { Cancel, DeleteOutlined, EditOutlined, Person, Save } from '@mui/icons-material';
+import { ChangeEvent, useState } from 'react';
+import { Avatar, IconButton, Menu, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Tooltip } from '@mui/material';
+import { Cancel, DeleteOutlined, EditOutlined, Launch, Person, Save } from '@mui/icons-material';
 import * as colors from '@mui/material/colors';
+import UserEndpoints from '../../api/UserEndpoints';
 
 
 // TODO: Remover esta importación
 import imageSrc from './../../assets/images/profile_photo_example.jpg';
-import useForm from '../../hooks/useForm';
-
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -40,6 +40,7 @@ const UserProfilePhoto = ({ image }: { image?: Uint8Array }) => {
 
 
 interface UserActionsProps {
+  onVisitUser: () => void;
   onEditRow: () => void;
   onDeleteRow: () => void;
 }
@@ -49,20 +50,28 @@ interface SaveDiscardChangesProps {
   onCancelRowChanges: () => void;
 }
 
-const UserActions = ({ onEditRow, onDeleteRow }: UserActionsProps) => {
+const UserActions = ({ onVisitUser, onEditRow, onDeleteRow }: UserActionsProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
+  
+  const userEndpoints = new UserEndpoints();
+
+
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   return (
     <span>
-      <Tooltip title='Editar registro'><IconButton onClick={ onEditRow } ><EditOutlined sx={{ color: '#ffba4b' }} /></IconButton></Tooltip>
-      <Tooltip title='Eliminar registro'><IconButton onClick={ handleClick }><DeleteOutlined  sx={{ color: '#ff5b5b' }} /></IconButton></Tooltip>
+      <Tooltip title='Ver usuario'><IconButton onClick={ onVisitUser }><Launch fontSize='small' /></IconButton></Tooltip>
+      <Tooltip title='Editar registro'><IconButton onClick={ onEditRow } ><EditOutlined fontSize='small' sx={{ color: '#ffcc7a' }} /></IconButton></Tooltip>
+      <Tooltip title='Eliminar registro'><IconButton onClick={ handleClick }><DeleteOutlined fontSize='small'  sx={{ color: '#ff6e6e' }} /></IconButton></Tooltip>
       <Menu
         id="basic-menu"
         anchorEl={anchorEl}
@@ -82,7 +91,7 @@ const UserActions = ({ onEditRow, onDeleteRow }: UserActionsProps) => {
       >
         <p style={{ fontSize: '0.8rem', padding: '0 8px' }}>¿Está seguro de eliminar este registro?</p>
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '0 8px' }}>
-          <button onClick={ onDeleteRow } style={{ fontSize: '0.8rem', padding: '4px 8px', backgroundColor: 'inherit', borderRadius: 16, color: '#ff5b5b', border: '1px solid #ff5b5b', cursor: 'pointer' }}>Eliminar</button>
+          <button onClick={ onDeleteRow } style={{ fontSize: '0.8rem', padding: '4px 8px', backgroundColor: 'inherit', borderRadius: 16, color: '#ff6e6e', border: '1px solid #ff6e6e', cursor: 'pointer' }}>Eliminar</button>
           <button onClick={ handleClose } style={{ fontSize: '0.8rem', padding: '4px 8px', backgroundColor: 'inherit', borderRadius: 16, color: 'rgba(255, 255, 255, 0.75)', border: '1px solid rgba(255, 255, 255, 0.35)', cursor: 'pointer' }}>Cancelar</button>
         </div>
         {/* <MenuItem onClick={handleClose}>Eliminar</MenuItem>
@@ -96,7 +105,7 @@ const SaveDiscardChanges = ({ onSaveRowChanges, onCancelRowChanges }: SaveDiscar
   return (
     <span>
       <Tooltip title='Guardar cambios'><IconButton onClick={ onSaveRowChanges } ><Save sx={{ color: '#c3daff' }} /></IconButton></Tooltip>
-      <Tooltip title='Descartar cambios'><IconButton onClick={ onCancelRowChanges } ><Cancel sx={{ color: '#ff5b5b' }} /></IconButton></Tooltip>
+      <Tooltip title='Descartar cambios'><IconButton onClick={ onCancelRowChanges } ><Cancel sx={{ color: '#ff6e6e' }} /></IconButton></Tooltip>
     </span>
   )
 };
@@ -251,6 +260,12 @@ export const UsersTable = () => {
   const [editRow, setEditRow] = useState<Row | null>( null );
   const [rows, setRows] = useState( rowsInitialValues );
 
+
+
+  const navigate = useNavigate();
+
+
+
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -291,6 +306,10 @@ export const UsersTable = () => {
   const onDeleteRow = ( rowId: number ) => {
     const updatedRows = rows.filter( row => row.id !== rowId );
     setRows( updatedRows );
+  }
+
+  const onVisitUser = ( rowId: number ) => {
+    navigate('/user/' + rowId);
   }
 
 	return (
@@ -346,7 +365,7 @@ export const UsersTable = () => {
                     <TableCell align='right'>
                       { row.id === editRow?.id
                         ? <SaveDiscardChanges onSaveRowChanges={ onSaveRowChanges } onCancelRowChanges={ onCancelRowChanges } />
-                        : <UserActions onEditRow={ () => onEditRowClick( row.id ) } onDeleteRow={ () => onDeleteRow( row.id ) } />
+                        : <UserActions onVisitUser={ () => onVisitUser( row.id ) } onEditRow={ () => onEditRowClick( row.id ) } onDeleteRow={ () => onDeleteRow( row.id ) } />
                       }
                     </TableCell>
                   </TableRow>

@@ -6,16 +6,24 @@ export function AddTask(arg1, arg2, arg3) {
   return window['go']['controllers']['ProjectController']['AddTask'](arg1, arg2, arg3);
 }
 
+export function CompleteTask(arg1) {
+  return window['go']['controllers']['ProjectController']['CompleteTask'](arg1);
+}
+
 export function CreateProject(arg1, arg2) {
   return window['go']['controllers']['ProjectController']['CreateProject'](arg1, arg2);
 }
 
-export function DeleteProject(arg1, arg2) {
-  return window['go']['controllers']['ProjectController']['DeleteProject'](arg1, arg2);
+export function DeleteProject(arg1) {
+  return window['go']['controllers']['ProjectController']['DeleteProject'](arg1);
 }
 
 export function DeleteTask(arg1, arg2) {
   return window['go']['controllers']['ProjectController']['DeleteTask'](arg1, arg2);
+}
+
+export function GetAllProjects() {
+  return window['go']['controllers']['ProjectController']['GetAllProjects']();
 }
 
 export function GetById(arg1) {
@@ -24,6 +32,10 @@ export function GetById(arg1) {
 
 export function GetFromUser(arg1) {
   return window['go']['controllers']['ProjectController']['GetFromUser'](arg1);
+}
+
+export function GetProjectTasks(arg1) {
+  return window['go']['controllers']['ProjectController']['GetProjectTasks'](arg1);
 }
 
 export function GetProjectsBySearchName(arg1) {
@@ -36,4 +48,12 @@ export function GetWithUserById(arg1) {
 
 export function MarkAsDone(arg1, arg2) {
   return window['go']['controllers']['ProjectController']['MarkAsDone'](arg1, arg2);
+}
+
+export function UpdateProject(arg1, arg2) {
+  return window['go']['controllers']['ProjectController']['UpdateProject'](arg1, arg2);
+}
+
+export function UpdateTask(arg1, arg2) {
+  return window['go']['controllers']['ProjectController']['UpdateTask'](arg1, arg2);
 }

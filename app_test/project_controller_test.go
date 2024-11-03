@@ -12,16 +12,34 @@ func TestCreateProject(t *testing.T) {
 	controller := GenerateProjectController()
 	createArtist(controller)
 
+	// Create a project
 	result := controller.CreateProject(1, dto.ProjectCreate{
 		Name: "ProjectExample",
 	})
 
-	project := controller.ProjectService.GetById(1)
+	// Retrieve the project by ID
+	project := controller.ProjectService.GetById(result.ProjectID)
 
-	if result != "OK" || project == nil {
-		t.Fatalf("It should have been created!")
+	// Check if the project was created successfully
+	if result.Result != "OK" || project == nil {
+		t.Fatalf("It should have been created! Result: %v", result.Result)
 		return
 	}
+
+	// Verify the project ID
+	if result.ProjectID == 0 {
+		t.Errorf("Expected projectId to be non-zero, got %v", result.ProjectID)
+	}
+
+	// Verify the project details
+	if project.Name != "ProjectExample" {
+		t.Errorf("Expected project name to be 'ProjectExample', got %v", project.Name)
+	}
+
+	// Print the project ID and name
+	fmt.Printf("Project ID: %v\n", result.ProjectID)
+	fmt.Printf("Project Name: %v\n", project.Name)
+
 	fmt.Println("Done!")
 }
 
@@ -33,8 +51,8 @@ func TestCreateProjectWithEmptyName(t *testing.T) {
 		Name: "",
 	})
 
-	if result != "EMPTY_NAME" {
-		t.Fatalf("Expected 'EMPTY_NAME', got '%s'", result)
+	if result.Result != "EMPTY_NAME" {
+		t.Fatalf("Expected 'EMPTY_NAME', got '%s'", result.Result)
 		return
 	}
 	fmt.Println("Done!")
@@ -52,8 +70,8 @@ func TestCreateProjectDuplicate(t *testing.T) {
 		Name: "ProjectExample",
 	})
 
-	if result != "NOT_CREATED_DUPLICATE" {
-		t.Fatalf("Duplicates on projects shouldn't exist. Expected output 'NOT_CREATED_DUPLICATE', received '%s'", result)
+	if result.Result != "NOT_CREATED_DUPLICATE" {
+		t.Fatalf("Duplicates on projects shouldn't exist. Expected output 'NOT_CREATED_DUPLICATE', received '%s'", result.Result)
 		return
 	}
 	fmt.Println("Done!")
@@ -72,8 +90,8 @@ func TestCreateWithDescription(t *testing.T) {
 
 	project := controller.ProjectService.GetById(1)
 
-	if result != "OK" && project.Description.String == description {
-		t.Fatalf("A project with description should be able to be created. Expected 'OK', received '%s'", result)
+	if result.Result != "OK" && project.Description.String == description {
+		t.Fatalf("A project with description should be able to be created. Expected 'OK', received '%s'", result.Result)
 		return
 	}
 	fmt.Println("Done!")
@@ -90,8 +108,8 @@ func TestCreateProjectWithEmptyDescription(t *testing.T) {
 		Description: &description,
 	})
 
-	if result != "INVALID_DESCRIPTION_LENGTH" {
-		t.Fatalf("Expected 'INVALID_DESCRIPTION_LENGTH', got '%s'", result)
+	if result.Result != "INVALID_DESCRIPTION_LENGTH" {
+		t.Fatalf("Expected 'INVALID_DESCRIPTION_LENGTH', got '%s'", result.Result)
 		return
 	}
 	fmt.Println("Done!")
@@ -324,7 +342,7 @@ func TestDeleteProject(t *testing.T) {
 		controller.AddTask(1, 1, *task)
 	}
 
-	result := controller.DeleteProject(1, 1)
+	result := controller.DeleteProject(1)
 
 	project := controller.ProjectService.GetById(1)
 
@@ -348,4 +366,44 @@ func TestDeleteTaskFromProject(t *testing.T) {
 		ActivityName: "Test this thing...",
 	})
 
+}
+
+func TestGetAllProjects(t *testing.T) {
+	controller := GenerateProjectController()
+	createArtist(controller)
+
+	projects := []dto.ProjectCreate{
+		{
+			Name: "Project1",
+		},
+		{
+			Name: "Project2",
+		},
+		{
+			Name: "Project3",
+		},
+		{
+			Name: "Project4",
+		},
+	}
+
+	for i := 0; i < len(projects); i++ {
+		project := projects[i]
+		controller.CreateProject(1, project)
+	}
+
+	// Eliminar Project2
+	controller.DeleteProject(2)
+
+	results := controller.GetAllProjects()
+
+	for i := 0; i < len(results); i++ {
+		project := results[i]
+		fmt.Printf("Project: %s\n", project.Name)
+	}
+
+	if len(results) != 3 {
+		t.Fatalf("Expected %d entities, got %d entities instead", 3, len(results))
+		return
+	}
 }

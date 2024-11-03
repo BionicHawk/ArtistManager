@@ -11,3 +11,4 @@ export * from './Container/Container';
 export * from './Alert/Alert';
 export * from './ProjectCard/ProjectCard';
 export * from './UsersTable/UsersTable';
+export * from './Modal/Modal';

@@ -15,4 +15,5 @@ type Project struct {
 	CreatedAt     time.Time      `json:"createdAt"`
 	EndedAt       sql.NullTime   `json:"endedAt"`
 	UserID        uint           `json:"userId"`
+	DeletedAt     sql.NullTime   `json:"deletedAt"`
 }

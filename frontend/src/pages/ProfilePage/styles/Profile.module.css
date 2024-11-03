@@ -9,6 +9,15 @@
     box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.356);
 }
 
+.avatarContainer {
+    display: flex;
+    flex: 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    /* width: 100%; */
+}
+
 .avatar {
     width: 16vw;
     border-radius: 50%;
@@ -28,7 +37,7 @@
 
 .EditButton {
     position: absolute;
-    transform: translate(70%, -100%);
+    transform: translate(-40%, -170%)
 }
 
 .avatar:hover {

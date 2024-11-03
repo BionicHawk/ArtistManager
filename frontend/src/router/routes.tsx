@@ -1,7 +1,6 @@
-import { createBrowserRouter, Navigate, Outlet, useNavigate } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { GeneralLayout, PrivateLayout, PrivateRoute, PublicLayout, PublicRoute } from "../components";
-import { Home, LoginPage, Profile, Projects, Settings, Users } from "../pages";
-import { useAuthStore, useUserStore } from "../store";
+import { Home, LoginPage, Profile, Projects, Settings, User, Users } from "../pages";
 import Project from "../pages/ProjectPage/Project";
 
 
@@ -17,7 +16,6 @@ export const routes = createBrowserRouter([
 			{
 				path: "/login",
 				element: <PublicRoute><PublicLayout><LoginPage /></PublicLayout></PublicRoute>,
-				
 			},
 			{
 				path: "/home",
@@ -34,6 +32,10 @@ export const routes = createBrowserRouter([
 			{
 				path: "/users",
 				element: <PrivateRoute><PrivateLayout><Users /></PrivateLayout></PrivateRoute>,
+			},
+			{
+				path: "/user/:userId",
+				element: <PrivateRoute><PrivateLayout><User /></PrivateLayout></PrivateRoute>
 			},
 			{
 				path: "/profile",

@@ -5,3 +5,4 @@ export * from './UsersPage/Users';
 export * from './ProjectsPage/Projects';
 export * from './SettingsPage/Settings';
 export * from './ProfilePage/Profile';
+export * from './UserPage/User';

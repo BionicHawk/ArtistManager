@@ -1,5 +1,19 @@
 export namespace dto {
 	
+	export class CreateProjectResponse {
+	    result: string;
+	    projectId: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new CreateProjectResponse(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.result = source["result"];
+	        this.projectId = source["projectId"];
+	    }
+	}
 	export class ProjectCreate {
 	    name: string;
 	    description?: string;
@@ -113,6 +127,24 @@ export namespace dto {
 	    }
 	}
 	
+	export class UpdateProject {
+	    projectId: number;
+	    userId: number;
+	    name?: string;
+	    description?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new UpdateProject(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.projectId = source["projectId"];
+	        this.userId = source["userId"];
+	        this.name = source["name"];
+	        this.description = source["description"];
+	    }
+	}
 	export class UserDtoOut {
 	    id: number;
 	    name: string;
@@ -284,6 +316,8 @@ export namespace models {
 	    // Go type: sql
 	    endedAt: any;
 	    userId: number;
+	    // Go type: sql
+	    deletedAt: any;
 	
 	    static createFrom(source: any = {}) {
 	        return new Project(source);
@@ -300,6 +334,7 @@ export namespace models {
 	        this.createdAt = this.convertValues(source["createdAt"], null);
 	        this.endedAt = this.convertValues(source["endedAt"], null);
 	        this.userId = source["userId"];
+	        this.deletedAt = this.convertValues(source["deletedAt"], null);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
