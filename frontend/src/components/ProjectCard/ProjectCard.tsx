@@ -8,9 +8,10 @@ interface ProjectCardProps {
 	project: Project;
 	updateProjects: () => Promise<void>;
 	handleEditProject: (project: Project) => void;
+	handleCompleteTask: (taskId: number) => void;
 }
 
-export const ProjectCard = ({ project, updateProjects, handleEditProject }: ProjectCardProps) => {
+export const ProjectCard = ({ project, updateProjects, handleEditProject, handleCompleteTask }: ProjectCardProps) => {
 	const [showTasks, setShowTasks] = useState( false );
 	const [anchorConfirmDeleteEle, setAnchorConfirmDeleteEle] = useState<null | HTMLElement>(null);
   const openConfirmDelete = Boolean(anchorConfirmDeleteEle);
@@ -29,11 +30,11 @@ export const ProjectCard = ({ project, updateProjects, handleEditProject }: Proj
     setAnchorConfirmDeleteEle( prev => null );
   };
 
-	const onEditProject = async (projectId: number) => {
-		const response = await projectEndpoints.GetById( projectId );
+	// const onEditProject = async (projectId: number) => {
+	// 	const response = await projectEndpoints.GetById( projectId );
 
-		console.log({ response });
-	}
+	// 	console.log({ response });
+	// }
 
 	const onConfirmDelete = async () => {
 		console.log({ anchorConfirmDeleteEle });
@@ -74,7 +75,7 @@ export const ProjectCard = ({ project, updateProjects, handleEditProject }: Proj
 						gap: 8
 					}}
 				>
-					<SquareButton icon={<VisibilityOutlined style={{ fontSize: '1rem', color: 'rgba(255, 255, 255, 0.8)' }} />} onClick={ () => console.log( 'Ver detalles' ) } />
+					{/* <SquareButton icon={<VisibilityOutlined style={{ fontSize: '1rem', color: 'rgba(255, 255, 255, 0.8)' }} />} onClick={ () => console.log( 'Ver detalles' ) } /> */}
 					<SquareButton icon={<EditNoteOutlined style={{ fontSize: '1rem', color: 'rgba(255, 255, 255, 0.8)' }} />} onClick={ () => handleEditProject( project ) } />
 					<SquareButton icon={<DeleteOutlined style={{ fontSize: '1rem', color: 'rgba(255, 255, 255, 0.8)' }} />} onClick={ onDeleteProject } />
 					<Menu
@@ -222,10 +223,17 @@ export const ProjectCard = ({ project, updateProjects, handleEditProject }: Proj
 									alignItems: 'center',
 								}}
 							>
-								<span>{ task.name }</span>
-								<span><Checkbox checked={ Boolean( task.completedAt ) } onChange={ () => {
-									console.log( 'Marcar como completado' );
-									
+								<span style={{ display: 'flex', flexDirection: 'column', }}>
+									<span style={{ textDecoration: Boolean(task.completedAt) ? 'line-through' : 'none' }}>
+										{ task.name }
+									</span>
+									{
+										task.completedAt &&
+										<span style={{ fontSize: '0.6rem' }}>Completado el: { new Date(task.completedAt).toLocaleDateString() } </span>
+									}
+								</span>
+								<span><Checkbox disabled={ Boolean( task.completedAt ) } checked={ Boolean( task.completedAt ) } onChange={ () => {
+									handleCompleteTask( task.id );
 								} } /></span>
 							</div>
 						) )

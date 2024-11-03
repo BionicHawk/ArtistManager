@@ -34,7 +34,7 @@ import UserEndpoints from '../../api/UserEndpoints'
 //   // Añade más proyectos aquí...
 // ]
 
-const steps = ['Crear proyecto', 'Asignar tareas'];
+const steps = ['Proyecto', 'Tareas'];
 
 export const Projects = () => {
   const [showCreateProjectModal, setShowCreateProjectModal] = useState( false );
@@ -138,7 +138,7 @@ export const Projects = () => {
   };
 
   const handleNextEdition = async () => {
-    console.log({ createdProjectId, userSelected, dataForm, inputValues });
+    // console.log({ createdProjectId, userSelected, dataForm, inputValues });
     if( dataForm.projectName.length < 4 ) { alert("El nombre del proyecto debe tener más de 3 caracteres."); return; }
     if( dataForm.projectDescription.length === 0 ) { alert("Debe agregar una descripción al proyecto."); return; }
 
@@ -162,11 +162,15 @@ export const Projects = () => {
         } );
         
     if( activeStep === 1 ) {
-      console.log({ inputValues });
       inputValues.forEach(async task => {
         if( task.activityName.length === 0 ) return;
 
-        await projectEndpoints.UpdateTask( task.id ?? 0, task.activityName );
+        if( task.id === undefined ) {
+          await projectEndpoints.AddTask( userSelected ?? 0, createdProjectId ?? 0, { activityName: task.activityName } );
+        } else {
+          await projectEndpoints.UpdateTask( task.id ?? 0, task.activityName );
+        }
+
       });
     }
   }
@@ -216,12 +220,12 @@ export const Projects = () => {
             id: projectEle.id,
             name: projectEle.name,
             description: projectEle.description.String,
-            taskCount: projectEle.numberOfTasks,
-            progress: projectEle.advancement,
+            taskCount: tasks.length,
+            progress: Number((tasks.filter(task => task.endedAt.Valid).length / tasks.length * 100 || 0).toFixed(0)),
             createdAt: new Date(projectEle.createdAt).toLocaleDateString(),
             completedAt: projectEle.endedAt.Valid ? new Date(projectEle.endedAt.Time).toLocaleDateString() : null,
             assignedUser: assignedUser,
-            tasks: tasks.map(task => ({id: task.id, completed: new Date(task.endedAt), name: task.activityName})),
+            tasks: tasks.map(task => ({id: task.id, completedAt: task.endedAt.Valid ? new Date(task.endedAt.Time) : undefined, name: task.activityName})),
           };
         }));
   
@@ -233,7 +237,7 @@ export const Projects = () => {
   }
 
   const handleEditProject = ( project: Project ) => {
-    console.log("Entró a editar2");
+    // console.log("Entró a editar2");
     toggleCreateProjectModal();
     setIsEdition( true );
     setActiveStep( 0 );
@@ -248,6 +252,7 @@ export const Projects = () => {
 
   const handleCompleteTask = async (taskId: number) => {
     await projectEndpoints.CompleteTask( taskId );
+
     getAllProjects();
   }
 
@@ -269,11 +274,11 @@ export const Projects = () => {
 
 			<div style={{ display: 'flex', gap: 16, flexDirection: 'column', }}>
 				{ projects.map( project => (
-					<ProjectCard key={ project.id } project={ project } updateProjects={ getAllProjects } handleEditProject={ () => handleEditProject(project) } />
+					<ProjectCard key={ project.id } project={ project } updateProjects={ getAllProjects } handleEditProject={ () => handleEditProject(project) } handleCompleteTask={ handleCompleteTask } />
 				) ).reverse() }
 			</div>
 
-      <Modal open={ showCreateProjectModal } handleClose={ toggleCreateProjectModal } title='Crear proyecto' >
+      <Modal open={ showCreateProjectModal } handleClose={ toggleCreateProjectModal } title={isEdition ? 'Editar proyecto' : 'Crear proyecto'} >
         <Stepper activeStep={activeStep} sx={{ width: '500px' }}>
           {steps.map((label, index) => {
             const stepProps: { completed?: boolean } = {};
@@ -298,7 +303,11 @@ export const Projects = () => {
         {activeStep === steps.length ? (
           <React.Fragment>
             <Typography sx={{ mt: 2, mb: 1 }}>
-              El proyecto fue creado con éxito.
+              {
+                isEdition
+                ? 'El proyecto fue editado con éxito.'
+                : 'El proyecto fue creado con éxito.'
+              }
             </Typography>
           </React.Fragment>
         ) : (
