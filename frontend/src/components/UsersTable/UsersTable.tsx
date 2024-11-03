@@ -62,11 +62,10 @@ const UserActions = ({ onVisitUser, onEditRow, onDeleteRow }: UserActionsProps) 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  console.log({ userEndpoints })
 
   return (
     <span>

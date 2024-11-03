@@ -5,9 +5,11 @@ import {models} from '../models';
 
 export function AddTask(arg1:number,arg2:number,arg3:dto.TaskCreate):Promise<string>;
 
-export function CreateProject(arg1:number,arg2:dto.ProjectCreate):Promise<string>;
+export function CompleteTask(arg1:number):Promise<models.Project>;
 
-export function DeleteProject(arg1:number,arg2:number):Promise<string>;
+export function CreateProject(arg1:number,arg2:dto.ProjectCreate):Promise<dto.CreateProjectResponse>;
+
+export function DeleteProject(arg1:number):Promise<string>;
 
 export function DeleteTask(arg1:number,arg2:number):Promise<string>;
 
@@ -17,8 +19,14 @@ export function GetById(arg1:number):Promise<dto.ProjectDtoOut>;
 
 export function GetFromUser(arg1:number):Promise<Array<models.Project>>;
 
+export function GetProjectTasks(arg1:number):Promise<Array<models.Task>>;
+
 export function GetProjectsBySearchName(arg1:string):Promise<Array<models.Project>>;
 
 export function GetWithUserById(arg1:number):Promise<dto.UserProjectDtoOut>;
 
 export function MarkAsDone(arg1:number,arg2:number):Promise<string>;
+
+export function UpdateProject(arg1:number,arg2:dto.UpdateProject):Promise<string>;
+
+export function UpdateTask(arg1:number,arg2:string):Promise<boolean>;

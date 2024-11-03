@@ -7,5 +7,5 @@ export interface Project {
 	createdAt: string;
 	completedAt: string | null;
 	assignedUser: string;
-	tasks: string[];
+	tasks: {id: number, name: string, completedAt?: Date}[];
 }

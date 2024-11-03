@@ -1,10 +1,11 @@
-import { Add, KeyboardArrowDown, Settings, } from '@mui/icons-material'
-import { Box, Button, Collapse, IconButton, LinearProgress, Step, StepLabel, Stepper, TextField, Typography } from '@mui/material'
-import { Project } from '../../interfaces'
+import { AccountCircle, Add, Close, KeyboardArrowDown, Settings, } from '@mui/icons-material'
+import { Box, Button, Collapse, FormControl, IconButton, Input, InputAdornment, InputLabel, LinearProgress, MenuItem, Select, SelectChangeEvent, Step, StepLabel, Stepper, TextField, Typography } from '@mui/material'
+import { Project, User } from '../../interfaces'
 import { Modal, ProjectCard } from '../../components'
 import React, { useEffect, useState } from 'react'
 import ProjectEndpoints from '../../api/ProjectEndpoints';
 import useForm from '../../hooks/useForm'
+import UserEndpoints from '../../api/UserEndpoints'
 
 // Datos de ejemplo
 // const projects: Project[] = [
@@ -40,24 +41,40 @@ export const Projects = () => {
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set<number>());
   const [projects, setProjects] = useState<Project[] | []>( []);
+  const [users, setUsers] = useState<User[] | []>( [] );
+  const [userSelected, setUserSelected] = React.useState<number | undefined>( undefined );
+  const [createdProjectId, setCreatedProjectId] = useState<number | null>( null );
+  const [inputValues, setInputValues] = useState<{ id?: number, activityName: string }[]>([]);
+  const [isEdition, setIsEdition] = useState( false );
+
+  const handleUserSelected = (event: SelectChangeEvent) => {
+    setUserSelected(Number(event.target.value));
+  };
 
 
 
 
 
-  const { dataForm, onChangeInput, clearForm } = useForm( { 
+  const { dataForm, setDataForm, onChangeInput, clearForm } = useForm( { 
     projectName: '',
     projectDescription: '',
-   } );
+  } );
 
 
   const projectEndpoints = new ProjectEndpoints();
+  const userEndpoints = new UserEndpoints();
 
 
 
 
 
-  const toggleCreateProjectModal = () => setShowCreateProjectModal( !showCreateProjectModal );
+  const toggleCreateProjectModal = () => {
+    clearForm();
+    setUserSelected( undefined );
+    setActiveStep( 0 );
+    setShowCreateProjectModal( !showCreateProjectModal );
+    setIsEdition( false );
+  };
 
   const isStepOptional = (step: number) => {
     return step === 1;
@@ -68,59 +85,134 @@ export const Projects = () => {
   };
 
   const handleNext = () => {
+    if( isEdition ) {
+      handleNextEdition()
+      return;
+    };
+
     let newSkipped = skipped;
+    
     if (isStepSkipped(activeStep)) {
       newSkipped = new Set(newSkipped.values());
       newSkipped.delete(activeStep);
     }
-
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped(newSkipped);
-
+    
     // Crear proyecto
-    if( activeStep === steps.length - 1 ) {
+    if( activeStep === 0 ) {
+      if( dataForm.projectName.length < 4 ) { alert("El nombre del proyecto debe tener más de 3 caracteres."); return; }
+      if( dataForm.projectDescription.length === 0 ) { alert("Debe agregar una descripción al proyecto."); return; }
+
+
       // Lógica para crear el proyecto
-      // TODO: Modificar el usaurio que se manda al endpoint (1)
-      projectEndpoints.CreateProject( 1, {
+      projectEndpoints.CreateProject( userSelected ?? 0 , {
         name: dataForm.projectName ?? 'Sin nombre',
         description: dataForm.projectDescription ?? 'Sin descripción',
       } )
         .then( response => {
-          console.log( response );
+          getAllProjects();
+          
+          if( response.result === 0 ) {
+            setCreatedProjectId( response.projectId );
             clearForm();
-            toggleCreateProjectModal();
-            getAllProjects();
+          }
         } );
-
     }
 
-  };
+    if( activeStep === 1 ) {
+      // Lógica para asignar tareas
+      inputValues.forEach( async taskName => {
+        await projectEndpoints.AddTask( userSelected ?? 0, createdProjectId ?? 0, { activityName: taskName.activityName } );
+      } );
 
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  const handleSkip = () => {
-    if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this,
-      // it should never occur unless someone's actively trying to break something.
-      throw new Error('You can\'t skip a step that isn\'t optional.');
+      setTimeout(() => {
+        getAllProjects();
+      }, 1000);
+      toggleCreateProjectModal();
+      setInputValues( [] );
+      setActiveStep( 0 );
     }
 
+    
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped((prevSkipped) => {
-      const newSkipped = new Set(prevSkipped.values());
-      newSkipped.add(activeStep);
-      return newSkipped;
-    });
+    setSkipped(newSkipped);
   };
 
-  const getAllProjects = () => {
-    projectEndpoints.GetAllProjects()
-    .then( response => {
-      if( response ) {
-        setProjects(
-          response.map(projectEle => ({
+  const handleNextEdition = async () => {
+    console.log({ createdProjectId, userSelected, dataForm, inputValues });
+    if( dataForm.projectName.length < 4 ) { alert("El nombre del proyecto debe tener más de 3 caracteres."); return; }
+    if( dataForm.projectDescription.length === 0 ) { alert("Debe agregar una descripción al proyecto."); return; }
+
+    // Lógica para editar el proyecto
+    projectEndpoints.UpdateProject( createdProjectId ?? 0, 
+      userSelected ?? 0,
+      dataForm.projectName ?? 'Sin nombre',
+      dataForm.projectDescription ?? 'Sin descripción',
+    )
+      .then( response => {
+        getAllProjects();
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+
+        projectEndpoints.GetProjectTasks( createdProjectId ?? 0 )
+          .then( tasks => {
+            setInputValues( tasks.map( task => ({ id: task.id, activityName: task.activityName }) ) );
+          } );
+          
+          // clearForm();
+          // toggleCreateProjectModal();
+        } );
+        
+    if( activeStep === 1 ) {
+      console.log({ inputValues });
+      inputValues.forEach(async task => {
+        if( task.activityName.length === 0 ) return;
+
+        await projectEndpoints.UpdateTask( task.id ?? 0, task.activityName );
+      });
+    }
+  }
+
+  // const handleBack = () => {
+  //   setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  // };
+
+  // const handleSkip = () => {
+  //   if (!isStepOptional(activeStep)) {
+  //     // You probably want to guard against something like this,
+  //     // it should never occur unless someone's actively trying to break something.
+  //     throw new Error('You can\'t skip a step that isn\'t optional.');
+  //   }
+
+  //   setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  //   setSkipped((prevSkipped) => {
+  //     const newSkipped = new Set(prevSkipped.values());
+  //     newSkipped.add(activeStep);
+  //     return newSkipped;
+  //   });
+  // };
+
+  const getUsers = async () => {
+    try {
+      const response = await userEndpoints.GetAllUsers();
+      if (response) {
+        setUsers(response);
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  }
+
+  const getAllProjects = async () => {
+    try {
+      const response = await projectEndpoints.GetAllProjects();
+      if (response) {
+        const projects = await Promise.all(response.map(async (projectEle) => {
+          const assignedUser = projectEle.userId === 0 
+            ? 'Sin usuario asignado' 
+            : await userEndpoints.GetUser(projectEle.userId).then(user => user?.name ?? '');
+
+          const tasks = await projectEndpoints.GetProjectTasks(projectEle.id);
+  
+          return {
             id: projectEle.id,
             name: projectEle.name,
             description: projectEle.description.String,
@@ -128,20 +220,41 @@ export const Projects = () => {
             progress: projectEle.advancement,
             createdAt: new Date(projectEle.createdAt).toLocaleDateString(),
             completedAt: projectEle.endedAt.Valid ? new Date(projectEle.endedAt.Time).toLocaleDateString() : null,
-            assignedUser: projectEle.userId === 0 ? 'Sin usuario asignado' : '', // Replace with actual user if available
-            // tasks: projectEle.tasks.map((task: Task) => task.name) || [], // Replace with actual tasks if available
-            tasks: ['', '', ''], // Replace with actual tasks if available
-          }))
-        );
-        console.log({ response });
+            assignedUser: assignedUser,
+            tasks: tasks.map(task => ({id: task.id, completed: new Date(task.endedAt), name: task.activityName})),
+          };
+        }));
+  
+        setProjects(projects);
       }
-    } );
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    }
   }
 
+  const handleEditProject = ( project: Project ) => {
+    console.log("Entró a editar2");
+    toggleCreateProjectModal();
+    setIsEdition( true );
+    setActiveStep( 0 );
+    setUserSelected( project.assignedUser === 'Sin usuario asignado' ? undefined : users.find( user => user.name === project.assignedUser )?.id );
+    setCreatedProjectId( project.id );
+    setInputValues( project.tasks.map(task => ({ id: task.id, activityName: task.name, completedAt: task.completedAt })) );
+    setDataForm({
+      projectName: project.name,
+      projectDescription: project.description,
+    });
+  }
+
+  const handleCompleteTask = async (taskId: number) => {
+    await projectEndpoints.CompleteTask( taskId );
+    getAllProjects();
+  }
 
 
   useEffect( () => {
     getAllProjects();
+    getUsers();
   }, [] );
 
 
@@ -156,7 +269,7 @@ export const Projects = () => {
 
 			<div style={{ display: 'flex', gap: 16, flexDirection: 'column', }}>
 				{ projects.map( project => (
-					<ProjectCard key={ project.id } project={ project } />
+					<ProjectCard key={ project.id } project={ project } updateProjects={ getAllProjects } handleEditProject={ () => handleEditProject(project) } />
 				) ).reverse() }
 			</div>
 
@@ -201,13 +314,30 @@ export const Projects = () => {
                   width: 500,
                   marginTop: 16,
                 }}>
+                  {/* <TextField size='small' name='projectName' value={ dataForm.projectName } onChange={ onChangeInput } label='' variant='outlined' fullWidth autoFocus /> */}
+                  <FormControl fullWidth size='small' sx={{ textAlign: 'left' }}>
+                    <InputLabel id="demo-simple-select-label">Asignar a empleado</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={ userSelected ? String(userSelected) : '' }
+                      label="Asignar a empleado"
+                      onChange={ handleUserSelected }
+                    >
+                      {
+                        users.map( user => (
+                          <MenuItem key={ user.id } value={ user.id }>{ user.name }</MenuItem>
+                        ) )
+                      }
+                    </Select>
+                  </FormControl>
                   <TextField size='small' name='projectName' value={ dataForm.projectName } onChange={ onChangeInput } label='Nombre del proyecto' variant='outlined' fullWidth autoFocus />
                   <TextField size='small' name='projectDescription' value={ dataForm.projectDescription } onChange={ onChangeInput } label='Descripción' variant='outlined' fullWidth multiline rows={4} />
                 </div>
               )
             }
 
-            {/* Segundo paso asignar tareas & usuarios */}
+            {/* Segundo paso asignar tareas */}
             { activeStep === 1 && (
                 <div style={{ 
                   display: 'flex', 
@@ -217,26 +347,57 @@ export const Projects = () => {
                   width: 500,
                   marginTop: 16,
                  }}>
+                  {
+                    // inputValues.map((inputValue, index) => <TextField key={index} size='small' value={inputValue} onChange={(e) => {
+                    //   const newInputValues = [...inputValues];
+                    //   newInputValues[index] = e.target.value;
+                    //   setInputValues(newInputValues);
+                    // }} label={`Tarea ${index + 1}`} variant='outlined' fullWidth />)
+                    inputValues.map((inputValue, index) => (
+                      <FormControl variant="standard">
+                        <InputLabel htmlFor="input-with-icon-adornment">
+                          {`Tarea ${index + 1}`}
+                        </InputLabel>
+                        <Input
+                          id="input-with-icon-adornment"
+                          endAdornment={
+                            <InputAdornment position="end">
+                              <IconButton size='small' onClick={ () => {
+                                // Limpiar el valor del input
+                                setInputValues(inputValues.filter((_, i) => i !== index));
+
+                                if(inputValues.length === 1) return;
+                                const newInputValues = [...inputValues];
+                                newInputValues.splice(index, 1);
+                                setInputValues(newInputValues);
+                              } }>
+                                <Close />
+                              </IconButton>
+                            </InputAdornment>
+                          }
+                          key={index} size='small' value={inputValue.activityName} onChange={(e) => {
+                            const newInputValues = [...inputValues];
+                            // newInputValues[index] = e.target.value;
+                            newInputValues[index] = { id: inputValue.id ,activityName: e.target.value };
+                            setInputValues(newInputValues);
+                          }}
+                        />
+                      </FormControl>)
+                    )
+                  }
+                  <Button size='small' onClick={() => setInputValues([...inputValues, {activityName: ''}])} variant='outlined' startIcon={<Add />}>Agregar tarea</Button>
                 </div>
               )
             }
   
             <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-              <Button
-                color='inherit'
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                sx={{ mr: 1 }}
-              >
-                Regresar
-              </Button>
               <Box sx={{ flex: '1 1 auto' }} />
               {/* {isStepOptional(activeStep) && (
                 <Button color='inherit' onClick={handleSkip} sx={{ mr: 1 }}>
                   Saltar
                 </Button>
               )} */}
-              <Button onClick={handleNext}>
+              <Button variant='contained' onClick={handleNext}>
                 {activeStep === steps.length - 1 ? 'Terminar' : 'Siguiente'}
               </Button>
             </Box>

@@ -149,3 +149,8 @@ func (service *UserService) UpdatePassword(user *models.User, newPassword string
 	service.DBContext.Model(&user).Update("pwd", newPassword)
 	return "OK"
 }
+
+func (service *UserService) GetAllUsers() (users []models.User) {
+	service.DBContext.Find(&users)
+	return users
+}

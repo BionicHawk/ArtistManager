@@ -88,3 +88,17 @@ func (controller *UserController) SearchByName(nameTerm string) []dto.UserDtoOut
 
 	return userOuts
 }
+
+func (controller *UserController) GetAllUsers() []dto.UserDtoOut {
+	users := controller.UserService.GetAllUsers()
+	userOuts := []dto.UserDtoOut{}
+
+	for i := 0; i < len(users); i++ {
+		user := &users[i]
+		out := controller.UserService.CreateDtoOut(user)
+
+		userOuts = append(userOuts, out)
+	}
+
+	return userOuts
+}

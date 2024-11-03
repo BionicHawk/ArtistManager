@@ -193,6 +193,17 @@ export default class UserEndpoints {
         }
     }
 
+    public async GetAllUsers(): Promise<Array<dto.UserDtoOut>> {
+        let users: Array<dto.UserDtoOut> = [];
+
+        await UserController.GetAllUsers()
+            .then(usersResult => {
+                users = [...users, ...usersResult];
+            });
+
+        return users;
+    }
+
 }
 
 export enum ChangePasswordResult {

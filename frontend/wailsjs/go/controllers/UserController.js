@@ -22,6 +22,10 @@ export function CreateUser(arg1) {
   return window['go']['controllers']['UserController']['CreateUser'](arg1);
 }
 
+export function GetAllUsers() {
+  return window['go']['controllers']['UserController']['GetAllUsers']();
+}
+
 export function GetUser(arg1) {
   return window['go']['controllers']['UserController']['GetUser'](arg1);
 }
