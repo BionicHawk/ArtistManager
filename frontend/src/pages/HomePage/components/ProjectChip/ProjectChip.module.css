@@ -1,0 +1,23 @@
+.chip {
+    background-color: #7a7a7a;
+    padding: 0.5em;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+.mainInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.projectName {
+    font-size: large;
+}
+
+.progressIndicator {
+    background-color: #6b2594;
+    padding: 0.3em;
+    border-radius: 0.5em;
+}
