@@ -102,3 +102,17 @@ func (controller *UserController) GetAllUsers() []dto.UserDtoOut {
 
 	return userOuts
 }
+
+func (controller *UserController) GetRecentUsers(days uint) []dto.UserDtoOut {
+	users := controller.UserService.GetRecentUsers(days)
+	userOuts := []dto.UserDtoOut{}
+
+	for i := 0; i < len(users); i++ {
+		user := &users[i]
+		out := controller.UserService.CreateDtoOut(user)
+
+		userOuts = append(userOuts, out)
+	}
+
+	return userOuts
+}

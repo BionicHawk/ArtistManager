@@ -4,6 +4,7 @@ import (
 	"ArtistManager/api_config/models"
 	"ArtistManager/api_config/models/dto"
 	"fmt"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -20,6 +21,15 @@ func (service *UserService) GetById(id uint) (user *models.User) {
 	}
 
 	return user
+}
+
+func (service *UserService) GetRecentUsers(days uint) []models.User {
+	var users []models.User
+
+	var fromTime = time.Now().AddDate(0, 0, -int(days)).UTC()
+	service.DBContext.Model(&models.User{}).Where("created_at >= ?", fromTime).Find(&users)
+
+	return users
 }
 
 func (service *UserService) GetByEmail(emailValue string) (user *models.User) {

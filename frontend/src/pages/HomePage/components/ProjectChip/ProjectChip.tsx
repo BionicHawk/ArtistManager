@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { dto, models } from "../../../../../wailsjs/go/models";
 import Styles from "./ProjectChip.module.css";
 import UserEndpoints from "../../../../api/UserEndpoints";
+import { Link } from "react-router-dom";
 
 export default function ProjectChip(props: {project: models.Project}) {
     const createdAt = new Date(props.project.createdAt);
@@ -20,9 +21,18 @@ export default function ProjectChip(props: {project: models.Project}) {
     
     return <div className={Styles.chip}>
         <div className={Styles.mainInfo}>
-            <div className={Styles.projectName}>{ props.project.name }</div>
+            <div className={Styles.projectName}>
+                <Link to={`/project/${props.project.id}`}>
+                    { props.project.name }
+                </Link>
+            </div>
             <div className={Styles.progressIndicator}>Progreso: { props.project.advancement }%</div>
         </div>
-        <div>Asignado a {projectUser?.name ?? ''} el {createdAt.toLocaleDateString()}</div>
+        {
+            projectUser ?
+                <div className={Styles.detail}>Asignado a {projectUser?.name ?? ''} el {createdAt.toLocaleDateString()}</div>
+                :
+                <div className={Styles.detail}>Cargando el detalle ...</div>
+        }
     </div>
 }

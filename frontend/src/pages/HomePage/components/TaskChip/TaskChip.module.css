@@ -12,7 +12,7 @@
     align-items: center;
 }
 
-.projectName {
+.taskName {
     font-size: large;
 
     a, a:hover, a:visited, a:active {

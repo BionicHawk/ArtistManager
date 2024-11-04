@@ -1,0 +1,8 @@
+.tasksContainer {
+    display: grid;
+    gap: 0.5em;
+    margin: 0.5em;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    overflow-y: auto;
+    max-height: 40dvh;
+}

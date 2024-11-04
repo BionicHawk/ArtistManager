@@ -91,5 +91,9 @@ func ScopeServices(database *gorm.DB) []interface{} {
 			ProjectService: &projectService,
 			TaskService:    &taskService,
 		},
+		&controllers.TaskController{
+			TaskService:   &taskService,
+			ProjectSerice: &projectService,
+		},
 	}
 }

@@ -26,6 +26,10 @@ export function GetAllUsers() {
   return window['go']['controllers']['UserController']['GetAllUsers']();
 }
 
+export function GetRecentUsers(arg1) {
+  return window['go']['controllers']['UserController']['GetRecentUsers'](arg1);
+}
+
 export function GetUser(arg1) {
   return window['go']['controllers']['UserController']['GetUser'](arg1);
 }

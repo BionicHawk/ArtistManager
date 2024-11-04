@@ -3,6 +3,7 @@ package services
 import (
 	"ArtistManager/api_config/models"
 	"ArtistManager/api_config/models/dto"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -29,9 +30,10 @@ func (service *TaskService) CreateTask(project *models.Project, taskCreate *dto.
 		(
 			ACTIVITY_NAME,
 			DESCRIPTION,
-			PROJECT_ID
+			PROJECT_ID,
+			CREATED_AT
 		)
-		VALUES(?, ?, ?)`, taskCreate.ActivityName, taskCreate.Description, project.ID).Error
+		VALUES(?, ?, ?, CURRENT_TIMESTAMP)`, taskCreate.ActivityName, taskCreate.Description, project.ID).Error
 
 	if err != nil {
 		return false
@@ -102,4 +104,12 @@ func (service *TaskService) UpdateTaskStatus(task *models.Task, status string) s
 		WHERE ID = ?`, task.ProjectID, task.ProjectID)
 
 	return "OK"
+}
+
+func (service *TaskService) GetRecent(days uint) []models.Task {
+	var tasks []models.Task
+	fromTime := time.Now().AddDate(0, 0, -int(days)).UTC()
+	service.DBContext.Model(&models.Task{}).Where("created_at >= ?", fromTime).Find(&tasks)
+
+	return tasks
 }

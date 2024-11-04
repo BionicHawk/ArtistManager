@@ -37,6 +37,7 @@ export namespace dto {
 	    createdAt: any;
 	    // Go type: time
 	    endedAt?: any;
+	    project: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new TaskDtoOut(source);
@@ -50,6 +51,7 @@ export namespace dto {
 	        this.status = source["status"];
 	        this.createdAt = this.convertValues(source["createdAt"], null);
 	        this.endedAt = this.convertValues(source["endedAt"], null);
+	        this.project = source["project"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
