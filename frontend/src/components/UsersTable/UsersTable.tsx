@@ -111,7 +111,7 @@ const UserActions = ({ onVisitUser, onEditRow, onDeleteRow }: UserActionsProps) 
 
 const SaveDiscardChanges = ({ onSaveRowChanges, onCancelRowChanges }: SaveDiscardChangesProps) => {
   return (
-    <span>
+    <span style={{ display: 'flex', flexFlow: 'row nowrap' }}>
       <Tooltip title='Guardar cambios'><IconButton onClick={ onSaveRowChanges } ><Save sx={{ color: '#c3daff' }} /></IconButton></Tooltip>
       <Tooltip title='Descartar cambios'><IconButton onClick={ onCancelRowChanges } ><Cancel sx={{ color: '#ff6e6e' }} /></IconButton></Tooltip>
     </span>
@@ -374,12 +374,12 @@ export const UsersTable = ({ users, handleEditUser, handleDeleteUser }: UsersTab
                     </TableCell>
                     <TableCell align='right'>
                       { row.id === editRow?.id
-                        // ? <TextField size='small' name='role' value={ editRow.role.label } onChange={ onRowChange } />
                         ? <FormControl fullWidth size='small'>
                             <InputLabel id="role-select-label">Rol</InputLabel>
                             <Select
                               size='small'
                               labelId="role-select-label"
+                              sx={{ textAlign: 'left' }}
                               value={ editRow.role.label }
                               label="Rol"
                               onChange={ (e) => {

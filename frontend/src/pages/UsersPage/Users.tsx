@@ -41,11 +41,25 @@ export const Users = () => {
 		if( dataForm.roleId === '1' ) result = await userEndpoints.CreateAdmin( dataForm );
 		if( dataForm.roleId === '2' ) result = await userEndpoints.CreateUser( dataForm );
 
-		if( dataForm.password !== dataForm.confirmPassword ) openAlert({ message: 'Las contraseñas no coinciden.', severity: 'error' });
+		if( dataForm.password !== dataForm.confirmPassword ) {
+			openAlert({ message: 'Las contraseñas no coinciden.', severity: 'error' })
+			return;
+		};
 
-		if(  result === CreateUserResult.INVALID_EMAIL ) openAlert({ message: 'Correo electrónico inválido.', severity: 'error' });
-		if(  result === CreateUserResult.INVALID_PASSWORD ) openAlert({ message: 'La contraseña debe tener 8 carácteres, al menos un número, una mayúscula y una minúscula.', severity: 'error' });
-		if(  result === CreateUserResult.USER_FOUND ) openAlert({ message: 'El usuario ya estaba registrado.', severity: 'error' });
+		if(  result === CreateUserResult.INVALID_EMAIL ) {
+			openAlert({ message: 'Correo electrónico inválido.', severity: 'error' })
+			return;
+		};
+
+		if(  result === CreateUserResult.INVALID_PASSWORD ) {
+			openAlert({ message: 'La contraseña debe tener 8 carácteres, al menos un número, una mayúscula y una minúscula.', severity: 'error' })
+			return;
+		};
+
+		if(  result === CreateUserResult.USER_FOUND ) {
+			openAlert({ message: 'El usuario ya estaba registrado.', severity: 'error' })
+			return;
+		};
 		
 		if(  result === CreateUserResult.OK ) {
 			openAlert({ message: 'Usuario registrado con éxito', severity: 'success' })
@@ -92,9 +106,9 @@ export const Users = () => {
 		getUsers();
 	}
 
-	useEffect( () => {
-		getUsers();
-	}, [] )
+	useEffect(() => {
+			getUsers();
+	}, []);
 
 	return (
 		<>
@@ -108,7 +122,10 @@ export const Users = () => {
 			<UsersTable users={ users } handleEditUser={ handleEditUser } handleDeleteUser={ handleDeleteUser } />
 
 			<Modal open={ showCreateUserModal } handleClose={ toggleCreateUserModal } title='Crear usuario'>
-				<form style={{ 
+				<form onSubmit={ (e) => {
+					e.preventDefault();
+					handleConfirmBtnModal();
+				} } style={{ 
 					display: 'flex', 
 					flexDirection: 'column', 
 					gap: 16, 
@@ -121,7 +138,7 @@ export const Users = () => {
 							<InputLabel size='small'>Tipo de usuario</InputLabel>
 							<Select size='small' label='Tipo de usuario' variant='outlined' fullWidth name='roleId' value={ dataForm.roleId } onChange={ (event) => {
 								onChangeInput( event as { target: EventTarget & (HTMLInputElement | HTMLTextAreaElement); }  );
-							} }>
+							} } sx={{ textAlign: 'left' }}>
 								<MenuItem value={ '1' } >Administrador</MenuItem>
 								<MenuItem value={ '2' }>Usuario</MenuItem>
 							</Select>
@@ -159,7 +176,7 @@ export const Users = () => {
 					<TextField size='small' label='Confirmar contraseña' variant='outlined' fullWidth type='password' name='confirmPassword' value={ dataForm.confirmPassword } onChange={ onChangeInput } />
 
 					<div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
-						<Button size='small' variant='contained' sx={{ width: '80px' }} onClick={ handleConfirmBtnModal } >Crear</Button>
+						<Button type='submit' size='small' variant='contained' sx={{ width: '80px' }} onClick={ handleConfirmBtnModal } >Crear</Button>
 					</div>
 				</form>
 			</Modal>

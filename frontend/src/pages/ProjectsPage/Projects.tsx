@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react'
 import ProjectEndpoints from '../../api/ProjectEndpoints';
 import useForm from '../../hooks/useForm'
 import UserEndpoints from '../../api/UserEndpoints'
+import { useAlert } from '../../hooks/useAlert'
 
 // Datos de ejemplo
 // const projects: Project[] = [
@@ -59,8 +60,7 @@ export const Projects = () => {
     projectName: '',
     projectDescription: '',
   } );
-
-
+  const { openAlert } = useAlert();
   const projectEndpoints = new ProjectEndpoints();
   const userEndpoints = new UserEndpoints();
 
@@ -99,8 +99,14 @@ export const Projects = () => {
     
     // Crear proyecto
     if( activeStep === 0 ) {
-      if( dataForm.projectName.length < 4 ) { alert("El nombre del proyecto debe tener más de 3 caracteres."); return; }
-      if( dataForm.projectDescription.length === 0 ) { alert("Debe agregar una descripción al proyecto."); return; }
+      if( dataForm.projectName.length < 4 ) {
+        openAlert({ message: "El nombre del proyecto debe tener más de 3 caracteres.", severity: 'error' });
+        return;
+      }
+      if( dataForm.projectDescription.length === 0 ) {
+        openAlert({ message: "Debe agregar una descripción al proyecto.", severity: 'error' });
+        return
+      }
 
 
       // Lógica para crear el proyecto
@@ -139,8 +145,14 @@ export const Projects = () => {
 
   const handleNextEdition = async () => {
     // console.log({ createdProjectId, userSelected, dataForm, inputValues });
-    if( dataForm.projectName.length < 4 ) { alert("El nombre del proyecto debe tener más de 3 caracteres."); return; }
-    if( dataForm.projectDescription.length === 0 ) { alert("Debe agregar una descripción al proyecto."); return; }
+    if( dataForm.projectName.length < 4 ) {
+      openAlert({  message: "El nombre del proyecto debe tener más de 3 caracteres.", severity: 'error' });
+      return;
+    }
+    if( dataForm.projectDescription.length === 0 ) {
+      openAlert({ message: "Debe agregar una descripción al proyecto.", severity: 'error' });
+      return;
+    }
 
     // Lógica para editar el proyecto
     projectEndpoints.UpdateProject( createdProjectId ?? 0, 
@@ -311,8 +323,10 @@ export const Projects = () => {
             </Typography>
           </React.Fragment>
         ) : (
-          <React.Fragment>
-
+          <form onSubmit={ (e) => {
+            e.preventDefault();
+            handleNext();
+          } }>
             {/* Primer paso crear proyecto */}
             { activeStep === 0 && (
                 <div style={{
@@ -406,11 +420,11 @@ export const Projects = () => {
                   Saltar
                 </Button>
               )} */}
-              <Button variant='contained' onClick={handleNext}>
+              <Button type='submit' variant='contained' onClick={handleNext}>
                 {activeStep === steps.length - 1 ? 'Terminar' : 'Siguiente'}
               </Button>
             </Box>
-          </React.Fragment>
+          </form>
         )}
 			</Modal>
 		</>
