@@ -1,5 +1,5 @@
-import { ChangeEvent, useState } from 'react';
-import { Avatar, IconButton, Menu, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Tooltip } from '@mui/material';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { Avatar, Box, FormControl, IconButton, InputLabel, Menu, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Tooltip } from '@mui/material';
 import { Cancel, DeleteOutlined, EditOutlined, Launch, Person, Save } from '@mui/icons-material';
 import * as colors from '@mui/material/colors';
 import UserEndpoints from '../../api/UserEndpoints';
@@ -8,14 +8,16 @@ import UserEndpoints from '../../api/UserEndpoints';
 // TODO: Remover esta importación
 import imageSrc from './../../assets/images/profile_photo_example.jpg';
 import { useNavigate } from 'react-router-dom';
+import { dto } from '../../../wailsjs/go/models';
+import { useAlert } from '../../hooks/useAlert';
+import { useUserStore } from '../../store';
+import AssetImage from '../AssetImage/AssetImage';
 
 
 
 
 
-const UserProfilePhoto = ({ image }: { image?: Uint8Array }) => {
-  const imageUrl = image ? URL.createObjectURL(new Blob([image])) : undefined;
-
+const UserProfilePhoto = ({ bytes }: { bytes?: string }) => {
   // Función para obtener un color aleatorio
   const getRandomColor = () => {
     const colorKeys = Object.keys(colors);
@@ -25,11 +27,17 @@ const UserProfilePhoto = ({ image }: { image?: Uint8Array }) => {
 
 
   return (
-    image ? (
-      <Avatar
-        src={ imageUrl }
-        sx={{ width: 48, height: 48 }}
-      />
+    bytes ? (
+      <Box sx={{
+        '& img': {
+          width: 48,
+          height: 48,
+          borderRadius: '50%',
+          objectFit: 'cover',
+        }
+      }}>
+        <AssetImage bytes={ bytes } key={ bytes } />
+      </Box>
     ) : (
       <Avatar sx={{ width: 48, height: 48, bgcolor: getRandomColor() }}>
         <Person sx={{ fontSize: '1.7rem', color: 'rgba(0, 0, 0, 0.8)', }} />
@@ -68,8 +76,8 @@ const UserActions = ({ onVisitUser, onEditRow, onDeleteRow }: UserActionsProps) 
   };
 
   return (
-    <span>
-      <Tooltip title='Ver usuario'><IconButton onClick={ onVisitUser }><Launch fontSize='small' /></IconButton></Tooltip>
+    <span style={{ display: 'flex', flexFlow: 'row nowrap', justifyContent: 'flex-end' }}>
+      {/* <Tooltip title='Ver usuario'><IconButton onClick={ onVisitUser }><Launch fontSize='small' /></IconButton></Tooltip> */}
       <Tooltip title='Editar registro'><IconButton onClick={ onEditRow } ><EditOutlined fontSize='small' sx={{ color: '#ffcc7a' }} /></IconButton></Tooltip>
       <Tooltip title='Eliminar registro'><IconButton onClick={ handleClick }><DeleteOutlined fontSize='small'  sx={{ color: '#ff6e6e' }} /></IconButton></Tooltip>
       <Menu
@@ -136,14 +144,14 @@ const convertImageToUint8Array = async (): Promise<Uint8Array> => {
 
 interface CreateRowParams {
   id: number,
-  imgSrc?: Uint8Array;
+  imgSrc?: string;
   user: string;
   email: string;
   role: string;
   date: Date;
 }
 
-interface Row {
+export interface RowUsersTable {
   id: number;
   profilePic: {
     label: JSX.Element;
@@ -171,7 +179,7 @@ const createRow = ({ id, imgSrc, user, email, role, date }: CreateRowParams ) =>
   return {
     id: id,
     profilePic: {
-      label: <UserProfilePhoto image={ imgSrc } />,
+      label: <UserProfilePhoto bytes={ imgSrc } />,
       editable: false,
     },
     user: {
@@ -227,42 +235,29 @@ const columns2 = [
   },
 ]
 
-const rowsInitialValues = [
-  createRow({ id: 1, imgSrc: undefined, user: 'Juan Pérez', email: 'juan.perez@examle.com', role: 'Admin', date: new Date('2021-10-15') }),
-  createRow({ id: 2, imgSrc: undefined, user: 'Ana Gómez', email: 'ana.gomez@example.com', role: 'User', date: new Date('2021-11-20') }),
-  createRow({ id: 3, imgSrc: undefined, user: 'Carlos Ruiz', email: 'carlos.ruiz@example.com', role: 'Moderator', date: new Date('2021-12-05') }),
-  createRow({ id: 4, imgSrc: undefined, user: 'María López', email: 'maria.lopez@example.com', role: 'Admin', date: new Date('2022-01-10') }),
-  createRow({ id: 5, imgSrc: undefined, user: 'Pedro Sánchez', email: 'pedro.sanchez@example.com', role: 'User', date: new Date('2022-02-15') }),
-  createRow({ id: 6, imgSrc: undefined, user: 'Lucía Fernández', email: 'lucia.fernandez@example.com', role: 'Moderator', date: new Date('2022-03-20') }),
-  createRow({ id: 7, imgSrc: undefined, user: 'Jorge Martínez', email: 'jorge.martinez@example.com', role: 'Admin', date: new Date('2022-04-25') }),
-  createRow({ id: 8, imgSrc: undefined, user: 'Laura García', email: 'laura.garcia@example.com', role: 'User', date: new Date('2022-05-30') }),
-  createRow({ id: 9, imgSrc: undefined, user: 'Sofía Rodríguez', email: 'sofia.rodriguez@example.com', role: 'Moderator', date: new Date('2022-06-04') }),
-  createRow({ id: 10, imgSrc: undefined, user: 'David Hernández', email: 'david.hernandez@example.com', role: 'Admin', date: new Date('2022-07-09') }),
-  createRow({ id: 11, imgSrc: undefined, user: 'Marta Jiménez', email: 'marta.jimenez@example.com', role: 'User', date: new Date('2022-08-14') }),
-  createRow({ id: 12, imgSrc: undefined, user: 'Raúl Díaz', email: 'raul.diaz@example.com', role: 'Moderator', date: new Date('2022-09-19') }),
-  createRow({ id: 13, imgSrc: undefined, user: 'Elena Torres', email: 'elena.torres@example.com', role: 'Admin', date: new Date('2022-10-24') }),
-  createRow({ id: 14, imgSrc: undefined, user: 'Pablo Romero', email: 'pablo.romero@example.com', role: 'User', date: new Date('2022-11-29') }),
-  createRow({ id: 15, imgSrc: undefined, user: 'Clara Vázquez', email: 'clara.vazquez@example.com', role: 'Moderator', date: new Date('2022-12-04') }),
-  createRow({ id: 16, imgSrc: undefined, user: 'Sergio Moreno', email: 'sergio.moreno@example.com', role: 'Admin', date: new Date('2023-01-09') }),
-  createRow({ id: 17, imgSrc: undefined, user: 'Paula Ruiz', email: 'paula.ruiz@example.com', role: 'User', date: new Date('2023-02-14') }),
-  createRow({ id: 18, imgSrc: undefined, user: 'Luis Gómez', email: 'luis.gomez@example.com', role: 'Moderator', date: new Date('2023-03-21') }),
-  createRow({ id: 19, imgSrc: undefined, user: 'Isabel Sánchez', email: 'isabel.sanchez@example.com', role: 'Admin', date: new Date('2023-04-26') }),
-  createRow({ id: 20, imgSrc: undefined, user: 'Miguel Fernández', email: 'miguel.fernandez@example.com', role: 'User', date: new Date('2023-05-31') }),
-  createRow({ id: 21, imgSrc: undefined, user: 'Natalia Martínez', email: 'natalia.martinez@example.com', role: 'Moderator', date: new Date('2023-06-05') })
-]
 
+interface UsersTableProps {
+  users: dto.UserDtoOut[];
+  handleEditUser: ( user: RowUsersTable ) => void;
+  handleDeleteUser: ( userId: number ) => void;
+}
 
+const roleMap = {
+  'ADMIN': 'Administrador',
+  'ARTIST': 'Artista',
+}
 
-
-export const UsersTable = () => {
+export const UsersTable = ({ users, handleEditUser, handleDeleteUser }: UsersTableProps) => {
 	const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [editRow, setEditRow] = useState<Row | null>( null );
-  const [rows, setRows] = useState( rowsInitialValues );
+  const [editRow, setEditRow] = useState<RowUsersTable | null>( null );
+  const [rows, setRows] = useState<RowUsersTable[]>([]);
 
 
 
   const navigate = useNavigate();
+  const { openAlert } = useAlert();
+  const { user } = useUserStore();
 
 
 
@@ -276,14 +271,18 @@ export const UsersTable = () => {
   };
 
   const onEditRowClick = ( rowId: number ) => {
-    setEditRow( rows.find( row => row.id === rowId ) || null );
+    const user = users.find(user => user.id === rowId);
+    if (user) {
+      const row = createRow({ id: user.id, imgSrc: user.profilePic ? user.profilePic.toString() : undefined, user: user.name, email: user.email, role: user.role, date: new Date(user.createdAt) });
+      setEditRow(row);
+    } else {
+      setEditRow(null);
+    }
   };
 
   // Actualiza el estado de editRow, con los nuevos valores
   const onRowChange = ( e: ChangeEvent<HTMLInputElement> ) => {
     const { value, name } = e.target;
-
-    console.log({ value, name })
 
     if( editRow ) {
       const updatedRow = { ...editRow, [name]: { label: value, editable: true } };
@@ -291,10 +290,21 @@ export const UsersTable = () => {
     }
   }
 
+	const validateEmail = (email: string): boolean => {
+		const re = /\S+@\S+\.\S+/;
+		return re.test(email);
+	}
+
   const onSaveRowChanges = () => {
+    const isValidEmail = validateEmail( editRow?.email.label ?? '' );
+
+		if( !isValidEmail ) {
+			openAlert({ message: 'Correo electrónico inválido.', severity: 'error' });
+			return;
+		}
+
     if( editRow ) {
-      const updatedRows = rows.map( row => row.id === editRow.id ? editRow : row );
-      setRows( updatedRows );
+      handleEditUser(editRow);
       setEditRow( null );
     }
   }
@@ -303,14 +313,23 @@ export const UsersTable = () => {
     setEditRow( null );
   }
 
-  const onDeleteRow = ( rowId: number ) => {
-    const updatedRows = rows.filter( row => row.id !== rowId );
-    setRows( updatedRows );
+  const onDeleteRow = ( row: RowUsersTable ) => {
+    if ( user?.id !== undefined && user?.id === row.id ) {
+      openAlert({ message: 'No puedes eliminar tu propio usuario.', severity: 'error' });
+      return;
+    }
+    
+    handleDeleteUser( row.id );
   }
 
   const onVisitUser = ( rowId: number ) => {
     navigate('/user/' + rowId);
   }
+
+  useEffect( () => {
+    const newRows = users.map( user => createRow({ id: user.id, imgSrc: user.profilePic ? user.profilePic.toString() : undefined, user: user.name, email: user.email, role: roleMap[user.role as keyof typeof roleMap] ?? '--', date: new Date( user.createdAt ) }) );
+    setRows( newRows );
+  }, [users] );
 
 	return (
 		<Paper sx={{ width: '100%', overflow: 'hidden', backgroundColor: 'rgba(255, 255, 255, 0.1)', '& .MuiTableCell-root': {borderBottom: '1px solid rgba(255, 255, 255, 0.6)'} }}>
@@ -355,7 +374,25 @@ export const UsersTable = () => {
                     </TableCell>
                     <TableCell align='right'>
                       { row.id === editRow?.id
-                        ? <TextField size='small' name='role' value={ editRow.role.label } onChange={ onRowChange } />
+                        // ? <TextField size='small' name='role' value={ editRow.role.label } onChange={ onRowChange } />
+                        ? <FormControl fullWidth size='small'>
+                            <InputLabel id="role-select-label">Rol</InputLabel>
+                            <Select
+                              size='small'
+                              labelId="role-select-label"
+                              value={ editRow.role.label }
+                              label="Rol"
+                              onChange={ (e) => {
+                                setEditRow({ ...editRow, role: { label: e.target.value as string, editable: true } });
+                              } }
+                            >
+                              {
+                                Object.entries(roleMap).map( ([key, value]) => (
+                                  <MenuItem key={key} value={key}>{value}</MenuItem>
+                                ))
+                              }
+                            </Select>
+                          </FormControl>
                         : row.role.label
                       }
                     </TableCell>
@@ -365,7 +402,7 @@ export const UsersTable = () => {
                     <TableCell align='right'>
                       { row.id === editRow?.id
                         ? <SaveDiscardChanges onSaveRowChanges={ onSaveRowChanges } onCancelRowChanges={ onCancelRowChanges } />
-                        : <UserActions onVisitUser={ () => onVisitUser( row.id ) } onEditRow={ () => onEditRowClick( row.id ) } onDeleteRow={ () => onDeleteRow( row.id ) } />
+                        : <UserActions onVisitUser={ () => onVisitUser( row.id ) } onEditRow={ () => onEditRowClick( row.id ) } onDeleteRow={ () => onDeleteRow( row ) } />
                       }
                     </TableCell>
                   </TableRow>

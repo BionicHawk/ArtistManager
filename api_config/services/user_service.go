@@ -132,13 +132,15 @@ func (service *UserService) CreateDtoOut(user *models.User) dto.UserDtoOut {
 }
 
 func (service *UserService) UpdateEmail(user *models.User, newEmail string) string {
-	if user.Email == newEmail {
-		return "SAME_EMAIL"
+	otherUserWithSameEmail := service.GetByEmail(newEmail)
+
+	if otherUserWithSameEmail != nil && otherUserWithSameEmail.ID != user.ID {
+		return "EMAIL_USED"
 	}
 
 	err := service.DBContext.Model(&user).Update("email", newEmail).Error
-
 	if err != nil {
+		fmt.Println("Error updating email:", err)
 		return "EMAIL_USED"
 	}
 
@@ -151,6 +153,49 @@ func (service *UserService) UpdatePassword(user *models.User, newPassword string
 }
 
 func (service *UserService) GetAllUsers() (users []models.User) {
-	service.DBContext.Find(&users)
+	service.DBContext.Where("active = 1").Find(&users)
 	return users
+}
+
+func (service *UserService) UpdateRole(userId uint, newRole string) bool {
+	var user *models.User
+
+	service.DBContext.First(&user, userId)
+
+	if user == nil {
+		return false
+	}
+
+	if newRole != "ADMIN" && newRole != "ARTIST" {
+		return false
+	}
+
+	errDb := service.DBContext.Model(&user).Update("role", newRole).Error
+	return errDb == nil
+}
+
+func (service *UserService) ChangeName(userId uint, newName string) bool {
+	var user *models.User
+
+	service.DBContext.First(&user, userId)
+
+	if user == nil {
+		return false
+	}
+
+	errDb := service.DBContext.Model(&user).Update("name", newName).Error
+	return errDb == nil
+}
+
+func (service *UserService) DeleteUser(userId uint) bool {
+	var user *models.User
+
+	service.DBContext.First(&user, userId)
+
+	if user == nil {
+		return false
+	}
+
+	service.DBContext.Model(&user).Update("active", 0)
+	return true
 }

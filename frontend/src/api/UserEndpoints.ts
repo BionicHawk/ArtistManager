@@ -116,10 +116,10 @@ export default class UserEndpoints {
      * @param newEmail the email to set on the user
      * @returns a `ChangeEmailResult` enumerator which will help you handle Ok and Error results
      */
-    public async ChangeEmail(oldEmail: string, newEmail: string): Promise<ChangeEmailResult> {
+    public async ChangeEmail(userId: number, newEmail: string): Promise<ChangeEmailResult> {
         let result = ChangeEmailResult.OK;
 
-        await UserController.ChangeEmail(oldEmail, newEmail)
+        await UserController.ChangeEmail(userId, newEmail)
             .then(petitionResult => {
                 switch (petitionResult) {
                     case "OK":
@@ -204,6 +204,38 @@ export default class UserEndpoints {
         return users;
     }
 
+    public async UpdateName(userId: number, name: string): Promise<boolean> {
+        let result = false;
+
+        await UserController.ChangeName(userId, name)
+            .then(petitionResult => {
+                result = petitionResult;
+            });
+
+        return result;
+    }
+
+    public async UpdateRole(userId: number, role: string): Promise<boolean> {
+        let result = false;
+
+        await UserController.UpdateRole(userId, role)
+            .then(petitionResult => {
+                result = petitionResult;
+            });
+
+        return result;
+    }
+
+    public async DeleteUser(userId: number): Promise<boolean> {
+        let result = false;
+
+        await UserController.DeleteUser(userId)
+            .then(petitionResult => {
+                result = petitionResult;
+            });
+
+        return result;
+    }
 }
 
 export enum ChangePasswordResult {

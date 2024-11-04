@@ -1,18 +1,42 @@
-import { Box, Fab, FormControl, IconButton, Input, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material';
+import { Box, Button, Fab, FormControl, IconButton, Input, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material';
 import { dto } from '../../../wailsjs/go/models';
 import { useUserStore } from '../../store'
 import ProfileStyles from './styles/Profile.module.css';
 import { AddPhotoAlternate, AlternateEmail, Badge, EmailRounded, Emergency, Key, Password, Visibility, VisibilityOff } from '@mui/icons-material';
 import { GetImage } from './functions/files';
-import UserEndpoints from '../../api/UserEndpoints';
+import UserEndpoints, { ChangeEmailResult, ChangePasswordResult } from '../../api/UserEndpoints';
 import AssetImage from '../../components/AssetImage/AssetImage';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import useForm from '../../hooks/useForm';
+import { useAlert } from '../../hooks/useAlert';
 
 export const Profile = () => {
-	const { user, setUser } = useUserStore();
-
 	const [showPassword, setShowPassword] = useState(false);
 	const [showPassword2, setShowPassword2] = useState(false);
+	const [originalProfile, setOriginalProfile] = useState( {} as dto.UserDtoOut );
+	const [profileHasChanges, setProfileHasChanges] = useState( false );
+	const [passwordHasChanges, setPasswordHasChanges] = useState( false );
+	
+	
+	
+	
+	const { openAlert } = useAlert();
+	const userEndpoints = new UserEndpoints();
+	const { user, setUser } = useUserStore();
+	const { dataForm: profileDataForm, setDataForm: profileSetDataForm, onChangeInput: profileOnChangeInput } = useForm({
+		name: '',
+		email: '',
+	});
+
+	const { dataForm: passwordDataForm, setDataForm: passwordSetDataForm, onChangeInput: passwordOnChangeInput } = useForm({
+		oldPassword: '',
+		newPassword: '',
+		newPassword2: ''
+	});
+
+
+
+
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   
@@ -25,30 +49,127 @@ export const Profile = () => {
   const handleMouseUpPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
+
+	const handleUpdateProfile = async () => {
+		if( !profileHasChanges ) return;
+
+		if( user === null ) {
+			openAlert({  message: 'No se pudo obtener información del perfil. Reincia sesión.', severity: 'error' });
+			return;
+		}
+
+		// Update profile
+		const changeEmailResult = await userEndpoints.ChangeEmail( user.id, profileDataForm.email);
+		const changeNameResult = await userEndpoints.UpdateName( user.id, profileDataForm.name);
+
+		const results = await Promise.all([changeEmailResult, changeNameResult]);
+
+		if( ChangeEmailResult[results[0]] === 'USER_NOT_FOUND' ) {
+			openAlert({ message: 'Usuario no encontrado', severity: 'error' });
+			return;
+		}
+
+		if( ChangeEmailResult[results[0]] === 'EMAIL_USED' ) {
+			openAlert({ message: 'El correo electrónico ya está en uso', severity: 'error' });
+			return;
+		}
+
+		if( !results[1] ) {
+			openAlert({ message: 'No se pudo actualizar el nombre', severity: 'error' });
+			return;
+		}
+
+		if( ChangeEmailResult[results[0]] === 'OK' && results[1] ) {
+			openAlert({ message: 'Perfil actualizado correctamente', severity: 'success' });
+			const userUpdate = await userEndpoints.GetUser(user.id);
+			if( userUpdate ) {
+				setUser(userUpdate);
+			}
+		}
+	}
+
+	const handleUpdatePassword = () => {
+		if( !passwordHasChanges ) return;
+
+		if( user === null ) {
+			openAlert({  message: 'No se pudo obtener información del perfil. Reincia sesión.', severity: 'error' });
+			return;
+		}
+
+		if( passwordDataForm.newPassword.length < 8 ) {
+			openAlert({ message: 'La contraseña debe tener al menos 8 caracteres', severity: 'error' });
+			return;
+		}
+
+		userEndpoints.ChangePassword(user.id, passwordDataForm.oldPassword, passwordDataForm.newPassword)
+			.then( result => {
+				switch( result ) {
+					case ChangePasswordResult['USER_NOT_FOUND']:
+						openAlert({ message: 'Usuario no encontrado', severity: 'error' });
+						break;
+					case ChangePasswordResult['OLD_PASSWORD_INVALID']:
+						openAlert({ message: 'Contraseña anterior incorrecta', severity: 'error' });
+						break;
+					case ChangePasswordResult['SAME_PASSWORD_INVALID']:
+						openAlert({ message: 'La nueva contraseña debe ser diferente a la anterior', severity: 'error' });
+						break;
+					case ChangePasswordResult['OK']:
+						openAlert({ message: 'Contraseña actualizada correctamente', severity: 'success' });
+						break;
+				}
+
+				passwordSetDataForm({
+					oldPassword: '',
+					newPassword: '',
+					newPassword2: ''
+				})
+			})
+	}
+
+
+
+
+
+
+	useEffect( () => {
+		if( !user ) return;
+
+		profileSetDataForm({
+			name: user.name,
+			email: user.email,
+		});
+
+		setOriginalProfile(user);
+	}, [user] )
+
+	useEffect( () => {
+		if( !user ) return;
+
+		setProfileHasChanges( profileDataForm.name !== originalProfile.name || profileDataForm.email !== originalProfile.email );
+	}, [profileDataForm] );
+
+	useEffect( () => {
+		setPasswordHasChanges( passwordDataForm.oldPassword !== '' || passwordDataForm.newPassword !== '' || passwordDataForm.newPassword2 !== '' );
+	}, [passwordDataForm] );
+
 	
 	return (
 		<div className='emergable'>	
 			<MainContent user={user!} onUpdate={setUser}/>
-			<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', maxWidth: 750, margin: '40px auto', }}>
+			<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', maxWidth: 750, margin: '40px auto',}}>
+				<div style={{ textAlign: 'left', fontWeight: 600, fontSize: '1.3rem' }}>Actualizar perfil</div>
+				<br />
 				<div style={{
 					display: 'flex',
-					flexDirection: 'column',
-					gap: 32,
+					flexFlow: 'row wrap',
+					gap: 60,
+					justifyContent: 'space-between',
 				}}>
-					<Box sx={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-						{/* <Badge />
-						<TextField
-							label='Nombre de usuario'
-							variant='standard' 
-							type='text'
-							sx={{width: 300}}
-							value={user?.name ?? ''}
-							/> */}
+					<Box sx={{display: 'flex', alignItems: 'center', gap: '8px', flex: 1,}}>
 						<TextField
 							fullWidth
 							label="Nombre de usuario"
-							value={user?.name ?? ''}
-							sx={{width: 300}}
+							// sx={{width: 300}}
 							slotProps={{
 								input: {
 									startAdornment: (
@@ -59,14 +180,16 @@ export const Profile = () => {
 								},
 							}}
 							variant="standard"
-							/>
+							name='name'
+							value={ profileDataForm.name }
+							onChange={ profileOnChangeInput }
+						/>
 					</Box>
-					<Box sx={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+					<Box sx={{display: 'flex', alignItems: 'center', gap: '8px', flex: 1,}}>
 						<TextField
 							fullWidth
 							label="Correo electrónico"
-							value={user?.email ?? ''}
-							sx={{width: 300}}
+							// sx={{width: 300}}
 							slotProps={{
 								input: {
 									startAdornment: (
@@ -77,16 +200,27 @@ export const Profile = () => {
 								},
 							}}
 							variant="standard"
+							name='email'
+							value={ profileDataForm.email }
+							onChange={ profileOnChangeInput }
 						/>
 					</Box>
 				</div> 
+				<div style={{ marginTop: 24, display: 'flex', justifyContent: 'left' }}>
+					<Button size='small' variant='contained' onClick={ handleUpdateProfile } disabled={ !profileHasChanges }>Actualizar perfil</Button>
+				</div>
+
+				<br /><br /><br /><br />
+
+				<div style={{ textAlign: 'left', fontWeight: 600, fontSize: '1.3rem' }}>Actualizar contraseña</div>
 				<div style={{
 					display: 'flex',
-					flexDirection: 'column',
-					gap: 32,
+					flexFlow: 'row wrap',
+					gap: 60,
+					justifyContent: 'space-between',
 				}}>
-					<Box sx={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-						<FormControl sx={{width: 300}} variant="standard">
+					<Box sx={{display: 'flex', alignItems: 'center', gap: '8px', flex: 1,}}>
+						<FormControl variant="standard" sx={{ width: '100%' }}>
 							<InputLabel htmlFor="outlined-adornment-password">Contraseña anterior</InputLabel>
 							<Input
 								id="outlined-adornment-password"
@@ -111,14 +245,17 @@ export const Profile = () => {
 										</IconButton>
 									</InputAdornment>
 								}
+								name='oldPassword'
+								value={ passwordDataForm.oldPassword }
+								onChange={ passwordOnChangeInput }
 							/>
 						</FormControl>
 					</Box>
-					<Box sx={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-						<FormControl sx={{width: 300}} variant="standard">
-							<InputLabel htmlFor="outlined-adornment-password">Nueva contraseña</InputLabel>
+					<Box sx={{display: 'flex', alignItems: 'center', gap: '8px', flex: 1,}}>
+						<FormControl variant="standard" sx={{ width: '100%' }}>
+							<InputLabel htmlFor="outlined-adornment-password2">Nueva contraseña</InputLabel>
 							<Input
-								id="outlined-adornment-password"
+								id="outlined-adornment-password2"
 								type={showPassword2 ? 'text' : 'password'}
 								startAdornment={
 									<InputAdornment position="start">
@@ -140,9 +277,15 @@ export const Profile = () => {
 										</IconButton>
 									</InputAdornment>
 								}
+								name='newPassword'
+								value={ passwordDataForm.newPassword }
+								onChange={ passwordOnChangeInput }
 							/>
 						</FormControl>
 					</Box>
+				</div>
+				<div style={{ marginTop: 24, display: 'flex', justifyContent: 'left' }}>
+					<Button size='small' variant='contained' onClick={ handleUpdatePassword } disabled={ !passwordHasChanges }>Actualizar contraseña</Button>
 				</div>
 			</div>
 		</div>

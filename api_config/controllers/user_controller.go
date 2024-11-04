@@ -43,14 +43,15 @@ func (controller *UserController) Login(email string, password string) *dto.User
 	return &userOut
 }
 
-func (controller *UserController) ChangeEmail(oldEmail string, newEmail string) string {
-	userOldEmail := controller.UserService.GetByEmail(oldEmail)
+func (controller *UserController) ChangeEmail(userId uint, newEmail string) string {
+	// userOldEmail := controller.UserService.GetByEmail(oldEmail)
+	user := controller.UserService.GetById(userId)
 
-	if userOldEmail == nil {
+	if user == nil {
 		return "USER_NOT_FOUND"
 	}
 
-	return controller.UserService.UpdateEmail(userOldEmail, newEmail)
+	return controller.UserService.UpdateEmail(user, newEmail)
 }
 
 func (controller *UserController) ChangePassword(userId uint, oldPassword string, newPassword string) string {
@@ -101,4 +102,16 @@ func (controller *UserController) GetAllUsers() []dto.UserDtoOut {
 	}
 
 	return userOuts
+}
+
+func (controller *UserController) UpdateRole(userId uint, newRole string) bool {
+	return controller.UserService.UpdateRole(userId, newRole)
+}
+
+func (controller *UserController) ChangeName(userId uint, newName string) bool {
+	return controller.UserService.ChangeName(userId, newName)
+}
+
+func (controller *UserController) DeleteUser(userId uint) bool {
+	return controller.UserService.DeleteUser(userId)
 }

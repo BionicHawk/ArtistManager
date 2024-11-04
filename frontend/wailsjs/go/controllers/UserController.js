@@ -6,6 +6,10 @@ export function ChangeEmail(arg1, arg2) {
   return window['go']['controllers']['UserController']['ChangeEmail'](arg1, arg2);
 }
 
+export function ChangeName(arg1, arg2) {
+  return window['go']['controllers']['UserController']['ChangeName'](arg1, arg2);
+}
+
 export function ChangePassword(arg1, arg2, arg3) {
   return window['go']['controllers']['UserController']['ChangePassword'](arg1, arg2, arg3);
 }
@@ -22,6 +26,10 @@ export function CreateUser(arg1) {
   return window['go']['controllers']['UserController']['CreateUser'](arg1);
 }
 
+export function DeleteUser(arg1) {
+  return window['go']['controllers']['UserController']['DeleteUser'](arg1);
+}
+
 export function GetAllUsers() {
   return window['go']['controllers']['UserController']['GetAllUsers']();
 }
@@ -36,4 +44,8 @@ export function Login(arg1, arg2) {
 
 export function SearchByName(arg1) {
   return window['go']['controllers']['UserController']['SearchByName'](arg1);
+}
+
+export function UpdateRole(arg1, arg2) {
+  return window['go']['controllers']['UserController']['UpdateRole'](arg1, arg2);
 }
