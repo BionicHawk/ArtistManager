@@ -23,6 +23,8 @@ export const Users = () => {
 		roleId: '',
 	});
 	const { openAlert } = useAlert();
+	const { user } = useUserStore();
+
 
 	const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -114,7 +116,10 @@ export const Users = () => {
 		<>
 			<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: 32, alignItems: 'center', }}>
 				<h1 className='title'>Usuarios</h1>
-				<Button variant='contained' size='small' onClick={ toggleCreateUserModal } startIcon={<Add />}>Crear</Button>
+				{
+					user && user.role === 'ADMIN' &&
+					<Button variant='contained' size='small' onClick={ toggleCreateUserModal } startIcon={<Add />}>Crear</Button>
+				}
 			</div>
 
 			<br />

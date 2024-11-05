@@ -208,30 +208,35 @@ const columns2 = [
     label: 'Usuario',
     minWidth: 170,
     align: 'left',
+    protected: false
   },
   {
     id: 'email',
     label: 'Correo',
     minWidth: 170,
     align: 'right',
+    protected: false
   },
   {
     id: 'role',
     label: 'Rol',
     minWidth: 170,
     align: 'right',
+    protected: false
   },
   {
     id: 'created_at',
     label: 'Fecha creación',
     minWidth: 170,
     align: 'right',
+    protected: false
   },
   {
     id: 'actions',
     label: 'Acciones',
     minWidth: 170,
     align: 'right',
+    protected: true
   },
 ]
 
@@ -327,8 +332,9 @@ export const UsersTable = ({ users, handleEditUser, handleDeleteUser }: UsersTab
   }
 
   useEffect( () => {
-    const newRows = users.map( user => createRow({ id: user.id, imgSrc: user.profilePic ? user.profilePic.toString() : undefined, user: user.name, email: user.email, role: roleMap[user.role as keyof typeof roleMap] ?? '--', date: new Date( user.createdAt ) }) );
-    setRows( newRows );
+    const allRows = users.map( user => createRow({ id: user.id, imgSrc: user.profilePic ? user.profilePic.toString() : undefined, user: user.name, email: user.email, role: roleMap[user.role as keyof typeof roleMap] ?? '--', date: new Date( user.createdAt ) }) );
+
+    setRows( allRows );
   }, [users] );
 
 	return (
@@ -338,13 +344,16 @@ export const UsersTable = ({ users, handleEditUser, handleDeleteUser }: UsersTab
           <TableHead>
             <TableRow>
               {columns2.map((column, index) => (
-                <TableCell
-                  key={column.id}
-                  align={index === 0 ? 'left' : 'right'}
-                  sx={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
-                >
-                  {column.label}
-                </TableCell>
+                (column.protected === false || (column.protected === true && user?.role === 'ADMIN')) &&
+                  <TableCell
+                    key={column.id}
+                    align={index === 0 ? 'left' : 'right'}
+                    sx={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+                  >
+                    {column.label}
+                  </TableCell>
+
+
               ))}
             </TableRow>
           </TableHead>
@@ -399,12 +408,15 @@ export const UsersTable = ({ users, handleEditUser, handleDeleteUser }: UsersTab
                     <TableCell align='right'>
                       { row.created_at.label }
                     </TableCell>
-                    <TableCell align='right'>
-                      { row.id === editRow?.id
-                        ? <SaveDiscardChanges onSaveRowChanges={ onSaveRowChanges } onCancelRowChanges={ onCancelRowChanges } />
-                        : <UserActions onVisitUser={ () => onVisitUser( row.id ) } onEditRow={ () => onEditRowClick( row.id ) } onDeleteRow={ () => onDeleteRow( row ) } />
-                      }
-                    </TableCell>
+                    {
+                      user?.role === 'ADMIN' &&
+                      <TableCell align='right'>
+                        { row.id === editRow?.id
+                          ? <SaveDiscardChanges onSaveRowChanges={ onSaveRowChanges } onCancelRowChanges={ onCancelRowChanges } />
+                          : <UserActions onVisitUser={ () => onVisitUser( row.id ) } onEditRow={ () => onEditRowClick( row.id ) } onDeleteRow={ () => onDeleteRow( row ) } />
+                        }
+                      </TableCell>
+                    }
                   </TableRow>
                 );
               })}

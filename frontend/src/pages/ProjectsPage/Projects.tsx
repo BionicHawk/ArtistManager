@@ -7,6 +7,7 @@ import ProjectEndpoints from '../../api/ProjectEndpoints';
 import useForm from '../../hooks/useForm'
 import UserEndpoints from '../../api/UserEndpoints'
 import { useAlert } from '../../hooks/useAlert'
+import { useUserStore } from '../../store'
 
 // Datos de ejemplo
 // const projects: Project[] = [
@@ -55,7 +56,7 @@ export const Projects = () => {
 
 
 
-
+  const { user } = useUserStore();
   const { dataForm, setDataForm, onChangeInput, clearForm } = useForm( { 
     projectName: '',
     projectDescription: '',
@@ -144,6 +145,7 @@ export const Projects = () => {
   };
 
   const handleNextEdition = async () => {
+    console.log('btn editar');
     // console.log({ createdProjectId, userSelected, dataForm, inputValues });
     if( dataForm.projectName.length < 4 ) {
       openAlert({  message: "El nombre del proyecto debe tener más de 3 caracteres.", severity: 'error' });
@@ -182,8 +184,14 @@ export const Projects = () => {
         } else {
           await projectEndpoints.UpdateTask( task.id ?? 0, task.activityName );
         }
-
       });
+
+      setTimeout(() => {
+        getAllProjects();
+      }, 1000);
+      toggleCreateProjectModal();
+      setInputValues( [] );
+      setActiveStep( 0 );
     }
   }
 
@@ -227,21 +235,32 @@ export const Projects = () => {
             : await userEndpoints.GetUser(projectEle.userId).then(user => user?.name ?? '');
 
           const tasks = await projectEndpoints.GetProjectTasks(projectEle.id);
+
+          const progress = Number((tasks.filter(task => task.endedAt.Valid).length / tasks.length * 100 || 0).toFixed(0));
+
+          const isDone = progress === 100;
+          let markAsDoneResult;
+
+          if( user && isDone ) markAsDoneResult = await projectEndpoints.MarkAsDone( user.id, projectEle.id );
+
+
   
           return {
             id: projectEle.id,
             name: projectEle.name,
             description: projectEle.description.String,
             taskCount: tasks.length,
-            progress: Number((tasks.filter(task => task.endedAt.Valid).length / tasks.length * 100 || 0).toFixed(0)),
+            progress: progress,
             createdAt: new Date(projectEle.createdAt).toLocaleDateString(),
-            completedAt: projectEle.endedAt.Valid ? new Date(projectEle.endedAt.Time).toLocaleDateString() : null,
+            completedAt: isDone ? new Date(markAsDoneResult === 0 ? projectEle.endedAt.Time : Date.now()).toLocaleDateString() : null,
             assignedUser: assignedUser,
             tasks: tasks.map(task => ({id: task.id, completedAt: task.endedAt.Valid ? new Date(task.endedAt.Time) : undefined, name: task.activityName})),
           };
         }));
-  
-        setProjects(projects);
+
+        const filteredProjects = projects.filter(project => user && project.assignedUser === user.name);
+        
+        setProjects(user && user.role === 'ARTIST' ? filteredProjects : projects);
       }
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -279,15 +298,22 @@ export const Projects = () => {
 		<>
 			<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: 32, alignItems: 'center', }}>
 				<h1 className='title'>Proyectos</h1>
-				<Button onClick={ toggleCreateProjectModal } variant='contained' size='small' startIcon={<Add />}>Crear</Button>
+        {
+          user?.role === 'ADMIN' &&
+  				<Button onClick={ toggleCreateProjectModal } variant='contained' size='small' startIcon={<Add />}>Crear</Button>
+        }
 			</div>
 
 			<br />
 
 			<div style={{ display: 'flex', gap: 16, flexDirection: 'column', }}>
-				{ projects.map( project => (
-					<ProjectCard key={ project.id } project={ project } updateProjects={ getAllProjects } handleEditProject={ () => handleEditProject(project) } handleCompleteTask={ handleCompleteTask } />
-				) ).reverse() }
+				{
+          projects.length === 0
+          ? <Typography variant='body1'>No tienes proyectos asignados.</Typography>
+          : projects.map( project => (
+              <ProjectCard key={ project.id } project={ project } updateProjects={ getAllProjects } handleEditProject={ () => handleEditProject(project) } handleCompleteTask={ handleCompleteTask } />
+            ) ).reverse()
+        }
 			</div>
 
       <Modal open={ showCreateProjectModal } handleClose={ toggleCreateProjectModal } title={isEdition ? 'Editar proyecto' : 'Crear proyecto'} >
@@ -377,7 +403,7 @@ export const Projects = () => {
                     //   setInputValues(newInputValues);
                     // }} label={`Tarea ${index + 1}`} variant='outlined' fullWidth />)
                     inputValues.map((inputValue, index) => (
-                      <FormControl variant="standard">
+                      <FormControl key={ index } variant="standard">
                         <InputLabel htmlFor="input-with-icon-adornment">
                           {`Tarea ${index + 1}`}
                         </InputLabel>
@@ -386,6 +412,7 @@ export const Projects = () => {
                           endAdornment={
                             <InputAdornment position="end">
                               <IconButton size='small' onClick={ () => {
+                                projectEndpoints.DeleteTask( 0, inputValue.id ?? 0 );
                                 // Limpiar el valor del input
                                 setInputValues(inputValues.filter((_, i) => i !== index));
 
@@ -420,7 +447,7 @@ export const Projects = () => {
                   Saltar
                 </Button>
               )} */}
-              <Button type='submit' variant='contained' onClick={handleNext}>
+              <Button type={ activeStep === steps.length - 1 ? 'submit' : 'button'} variant='contained' onClick={handleNext}>
                 {activeStep === steps.length - 1 ? 'Terminar' : 'Siguiente'}
               </Button>
             </Box>

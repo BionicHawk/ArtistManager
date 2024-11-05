@@ -3,6 +3,7 @@ import { Project } from "../../interfaces";
 import { DeleteOutlined, Done, EditNoteOutlined, KeyboardArrowDown, VisibilityOutlined } from "@mui/icons-material";
 import React, { useState } from "react";
 import ProjectEndpoints from "../../api/ProjectEndpoints";
+import { useUserStore } from "../../store";
 
 interface ProjectCardProps {
 	project: Project;
@@ -17,6 +18,7 @@ export const ProjectCard = ({ project, updateProjects, handleEditProject, handle
   const openConfirmDelete = Boolean(anchorConfirmDeleteEle);
 
 	const projectEndpoints = new ProjectEndpoints();
+	const { user } = useUserStore();
 
 	const handleToggleShowTasks = () => {
 		setShowTasks( !showTasks );
@@ -29,12 +31,6 @@ export const ProjectCard = ({ project, updateProjects, handleEditProject, handle
 	const handleCloseConfirmDelete = () => {
     setAnchorConfirmDeleteEle( prev => null );
   };
-
-	// const onEditProject = async (projectId: number) => {
-	// 	const response = await projectEndpoints.GetById( projectId );
-
-	// 	console.log({ response });
-	// }
 
 	const onConfirmDelete = async () => {
 		console.log({ anchorConfirmDeleteEle });
@@ -75,34 +71,39 @@ export const ProjectCard = ({ project, updateProjects, handleEditProject, handle
 						gap: 8
 					}}
 				>
-					{/* <SquareButton icon={<VisibilityOutlined style={{ fontSize: '1rem', color: 'rgba(255, 255, 255, 0.8)' }} />} onClick={ () => console.log( 'Ver detalles' ) } /> */}
-					<SquareButton icon={<EditNoteOutlined style={{ fontSize: '1rem', color: 'rgba(255, 255, 255, 0.8)' }} />} onClick={ () => handleEditProject( project ) } />
-					<SquareButton icon={<DeleteOutlined style={{ fontSize: '1rem', color: 'rgba(255, 255, 255, 0.8)' }} />} onClick={ onDeleteProject } />
-					<Menu
-						id="basic-menu"
-						anchorEl={anchorConfirmDeleteEle}
-						open={openConfirmDelete}
-						onClose={handleCloseConfirmDelete}
-						MenuListProps={{
-							'aria-labelledby': 'basic-button',
-						}}
-						anchorOrigin={{
-							vertical: 'bottom',
-							horizontal: 'center',
-						}}
-						transformOrigin={{
-							vertical: 'top',
-							horizontal: 'right',
-						}}
-					>
-						<p style={{ fontSize: '0.8rem', padding: '0 8px' }}>¿Está seguro de eliminar este registro?</p>
-						<div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '0 8px' }}>
-							<button onClick={ onConfirmDelete } style={{ fontSize: '0.8rem', padding: '4px 8px', backgroundColor: 'inherit', borderRadius: 16, color: '#ff6e6e', border: '1px solid #ff6e6e', cursor: 'pointer' }}>Eliminar</button>
-							<button onClick={ handleCloseConfirmDelete } style={{ fontSize: '0.8rem', padding: '4px 8px', backgroundColor: 'inherit', borderRadius: 16, color: 'rgba(255, 255, 255, 0.75)', border: '1px solid rgba(255, 255, 255, 0.35)', cursor: 'pointer' }}>Cancelar</button>
-						</div>
-						{/* <MenuItem onClick={handleClose}>Eliminar</MenuItem>
-						<MenuItem onClick={handleClose}>Cancelar</MenuItem> */}
-					</Menu>
+					{
+						user?.role === 'ADMIN' &&
+						<>
+							{/* <SquareButton icon={<VisibilityOutlined style={{ fontSize: '1rem', color: 'rgba(255, 255, 255, 0.8)' }} />} onClick={ () => console.log( 'Ver detalles' ) } /> */}
+							<SquareButton icon={<EditNoteOutlined style={{ fontSize: '1rem', color: 'rgba(255, 255, 255, 0.8)' }} />} onClick={ () => handleEditProject( project ) } />
+							<SquareButton icon={<DeleteOutlined style={{ fontSize: '1rem', color: 'rgba(255, 255, 255, 0.8)' }} />} onClick={ onDeleteProject } />
+							<Menu
+								id="basic-menu"
+								anchorEl={anchorConfirmDeleteEle}
+								open={openConfirmDelete}
+								onClose={handleCloseConfirmDelete}
+								MenuListProps={{
+									'aria-labelledby': 'basic-button',
+								}}
+								anchorOrigin={{
+									vertical: 'bottom',
+									horizontal: 'center',
+								}}
+								transformOrigin={{
+									vertical: 'top',
+									horizontal: 'right',
+								}}
+							>
+								<p style={{ fontSize: '0.8rem', padding: '0 8px' }}>¿Está seguro de eliminar este registro?</p>
+								<div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '0 8px' }}>
+									<button onClick={ onConfirmDelete } style={{ fontSize: '0.8rem', padding: '4px 8px', backgroundColor: 'inherit', borderRadius: 16, color: '#ff6e6e', border: '1px solid #ff6e6e', cursor: 'pointer' }}>Eliminar</button>
+									<button onClick={ handleCloseConfirmDelete } style={{ fontSize: '0.8rem', padding: '4px 8px', backgroundColor: 'inherit', borderRadius: 16, color: 'rgba(255, 255, 255, 0.75)', border: '1px solid rgba(255, 255, 255, 0.35)', cursor: 'pointer' }}>Cancelar</button>
+								</div>
+								{/* <MenuItem onClick={handleClose}>Eliminar</MenuItem>
+								<MenuItem onClick={handleClose}>Cancelar</MenuItem> */}
+							</Menu>
+						</>
+					}
 				</div>
 			</div>
 
