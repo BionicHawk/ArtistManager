@@ -18,6 +18,8 @@ export function DeleteUser(arg1:number):Promise<boolean>;
 
 export function GetAllUsers():Promise<Array<dto.UserDtoOut>>;
 
+export function GetRecentUsers(arg1:number):Promise<Array<dto.UserDtoOut>>;
+
 export function GetUser(arg1:number):Promise<dto.UserDtoOut>;
 
 export function Login(arg1:string,arg2:string):Promise<dto.UserDtoOut>;

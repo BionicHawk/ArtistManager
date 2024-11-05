@@ -115,3 +115,17 @@ func (controller *UserController) ChangeName(userId uint, newName string) bool {
 func (controller *UserController) DeleteUser(userId uint) bool {
 	return controller.UserService.DeleteUser(userId)
 }
+
+func (controller *UserController) GetRecentUsers(days uint) []dto.UserDtoOut {
+	users := controller.UserService.GetRecentUsers(days)
+	userOuts := []dto.UserDtoOut{}
+
+	for i := 0; i < len(users); i++ {
+		user := &users[i]
+		out := controller.UserService.CreateDtoOut(user)
+
+		userOuts = append(userOuts, out)
+	}
+
+	return userOuts
+}

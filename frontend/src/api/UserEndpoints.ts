@@ -165,6 +165,17 @@ export default class UserEndpoints {
         return users;
     }
 
+    public async GetRecentUsers(days: number): Promise<Array<dto.UserDtoOut>> {
+        let users: Array<dto.UserDtoOut> = [];
+
+        await UserController.GetRecentUsers(days)
+            .then(usersResult => {
+                users = [...users, ...usersResult];
+            });
+
+        return users;
+    }
+
     public async UpdateUserImage(userId: number, image: File): Promise<string | null> {
         const fileReader = new FileReader();
 

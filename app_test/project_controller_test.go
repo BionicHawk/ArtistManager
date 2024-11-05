@@ -354,6 +354,41 @@ func TestDeleteProject(t *testing.T) {
 	fmt.Println("Done!")
 }
 
+func TestRecentTasksProject(t *testing.T) {
+	controller := GenerateProjectController()
+	createArtist(controller)
+
+	controller.CreateProject(1, dto.ProjectCreate{
+		Name: "A project",
+	})
+
+	tasks := []dto.TaskCreate{
+		{
+			ActivityName: "Task1",
+		},
+		{
+			ActivityName: "Task2",
+		},
+		{
+			ActivityName: "Task3",
+		},
+	}
+
+	for i := 0; i < len(tasks); i++ {
+		task := &tasks[i]
+		controller.AddTask(1, 1, *task)
+	}
+
+	recentTasks := controller.TaskService.GetRecent(7)
+
+	if len(recentTasks) != 5 {
+		t.Fatalf("Exepected '5', got '%d'", len(recentTasks))
+		return
+	}
+
+	fmt.Println("Done!")
+}
+
 func TestDeleteTaskFromProject(t *testing.T) {
 	controller := GenerateProjectController()
 	createArtist(controller)
