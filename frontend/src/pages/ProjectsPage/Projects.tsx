@@ -57,7 +57,8 @@ export const Projects = () => {
 
 
   const { user } = useUserStore();
-  const { dataForm, setDataForm, onChangeInput, clearForm } = useForm( { 
+  const { dataForm, setDataForm, onChangeInput, clearForm } = useForm( {
+    id: 0,
     projectName: '',
     projectDescription: '',
   } );
@@ -276,6 +277,7 @@ export const Projects = () => {
     setCreatedProjectId( project.id );
     setInputValues( project.tasks.map(task => ({ id: task.id, activityName: task.name, completedAt: task.completedAt })) );
     setDataForm({
+      id: project.id,
       projectName: project.name,
       projectDescription: project.description,
     });
@@ -412,14 +414,19 @@ export const Projects = () => {
                           endAdornment={
                             <InputAdornment position="end">
                               <IconButton size='small' onClick={ () => {
-                                projectEndpoints.DeleteTask( 0, inputValue.id ?? 0 );
-                                // Limpiar el valor del input
-                                setInputValues(inputValues.filter((_, i) => i !== index));
 
-                                if(inputValues.length === 1) return;
-                                const newInputValues = [...inputValues];
-                                newInputValues.splice(index, 1);
-                                setInputValues(newInputValues);
+                                if( inputValue.id === undefined ) {
+                                  const newInputValues = [...inputValues];
+                                  newInputValues.splice(index, 1);
+                                  setInputValues(newInputValues);
+                                  return;
+                                } else {
+                                  projectEndpoints.DeleteTask( dataForm.id, inputValue.id );
+
+                                  const newInputValues = [...inputValues];
+                                  newInputValues.splice(index, 1);
+                                  setInputValues(newInputValues);
+                                }
                               } }>
                                 <Close />
                               </IconButton>
