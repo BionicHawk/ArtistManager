@@ -225,7 +225,7 @@ func (service *ProjectService) CompleteTask(taskId uint) *models.Project {
 		return nil
 	}
 
-	service.DBContext.Model(&task).Update("completed_at", time.Now())
+	service.DBContext.Model(&task).Update("ended_at", time.Now())
 
 	project := models.Project{}
 	service.DBContext.First(&project, "id = ?", task.ProjectID)

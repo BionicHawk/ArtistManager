@@ -27,11 +27,12 @@
     border: 5px solid rgb(96, 38, 163);
     margin-bottom: 8px;
     transition: box-shadow 0.3s;
-
+    
     img {
         width: 100%;
         height: 100%;
         aspect-ratio: 1 / 1;
+        object-fit: cover;
     }
 }
 

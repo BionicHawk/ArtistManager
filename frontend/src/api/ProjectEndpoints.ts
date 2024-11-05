@@ -222,6 +222,14 @@ export default class ProjectEndpoints {
 
         return result;
     }
+
+    public async DeleteTask(projectId: number, taskId: number): Promise<any> {
+        let result;
+
+        result = await ProjectController.DeleteTask(projectId, taskId);
+
+        return result;
+    }
 }
 
 export enum CreateProjectResult {

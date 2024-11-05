@@ -140,9 +140,9 @@ func (controller *ProjectController) MarkAsDone(userId uint, projectId uint) str
 func (controller *ProjectController) DeleteTask(projectId uint, taskId uint) string {
 	project := controller.ProjectService.GetById(projectId)
 
-	if project == nil {
-		return "PROJECT_NOT_FOUND"
-	}
+	// if project == nil {
+	// 	return "PROJECT_NOT_FOUND"
+	// }
 
 	result := controller.TaskService.DeleteTask(project, taskId)
 

@@ -60,9 +60,6 @@ export const PrivateLayout = ({ children }: PrivateLayoutProps) => {
 						<div className={ styles.profile_container }>
 							<NavLink to='/profile' className={ styles.user_profile }>
 								<AssetImage bytes={user?.profilePic?.toString()}/>
-								{/* <Icon sx={{ fontSize: '2rem', }}>
-								{ user?.profilePic || <AccountCircle style={{ fontSize: 'inherit' }} /> }
-								</Icon> */}
 								<span className={ styles.user_name }>{ user?.name || '-' }</span>
 							</NavLink>
 							<IconButton onClick={ handleMoreClick }><MoreVert /></IconButton>
@@ -111,12 +108,12 @@ const ProfileMenu = ({  anchorEl, setAnchorEl }: {anchorEl: any, setAnchorEl: an
 		>
 			<MenuItem onClick={() => {
 				handleClose();
-				navigate('/settings');
+				navigate('/profile');
 			}}>
 				<ListItemIcon>
 					<Settings fontSize="small" />
 				</ListItemIcon>
-				Ajustes
+				Perfil
 			</MenuItem>
 			<MenuItem onClick={handleClose}>
 				<ListItemIcon>
