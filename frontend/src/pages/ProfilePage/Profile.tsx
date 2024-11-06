@@ -295,6 +295,7 @@ export const Profile = () => {
 function MainContent(props: MainContentProperties) {
 
 	const UserController = new UserEndpoints();
+	const { openAlert } = useAlert();
 
 	async function onEditImage() {
 		const image = await GetImage();
@@ -302,14 +303,14 @@ function MainContent(props: MainContentProperties) {
 		if (image) {
 			const result = await UserController.UpdateUserImage(props.user.id, image);
 			if (result) {
-				alert('La imagen se subió correctamente');
+				openAlert({ message: 'La imagen se subió correctamente', severity: 'success' });
 				const userUpdate = await UserController.GetUser(props.user.id);
 				if (userUpdate) {
 					props.onUpdate(userUpdate);
 				}
 				
 			} else {
-				alert('La imagen no se pudo subir');
+				alert('La imagen no se pudo subir' + JSON.stringify(result));
 			}
 		}
 	}

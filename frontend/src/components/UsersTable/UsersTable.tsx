@@ -111,7 +111,7 @@ const UserActions = ({ onVisitUser, onEditRow, onDeleteRow }: UserActionsProps) 
 
 const SaveDiscardChanges = ({ onSaveRowChanges, onCancelRowChanges }: SaveDiscardChangesProps) => {
   return (
-    <span style={{ display: 'flex', flexFlow: 'row nowrap' }}>
+    <span style={{ display: 'flex', flexFlow: 'row nowrap', justifyContent: 'flex-end' }}>
       <Tooltip title='Guardar cambios'><IconButton onClick={ onSaveRowChanges } ><Save sx={{ color: '#c3daff' }} /></IconButton></Tooltip>
       <Tooltip title='Descartar cambios'><IconButton onClick={ onCancelRowChanges } ><Cancel sx={{ color: '#ff6e6e' }} /></IconButton></Tooltip>
     </span>

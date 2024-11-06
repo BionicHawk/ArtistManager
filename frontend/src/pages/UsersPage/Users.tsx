@@ -40,28 +40,33 @@ export const Users = () => {
 
 	const handleConfirmBtnModal = async () => {
 		let result: CreateUserResult = CreateUserResult.OK;
-		if( dataForm.roleId === '1' ) result = await userEndpoints.CreateAdmin( dataForm );
-		if( dataForm.roleId === '2' ) result = await userEndpoints.CreateUser( dataForm );
 
 		if( dataForm.password !== dataForm.confirmPassword ) {
 			openAlert({ message: 'Las contraseñas no coinciden.', severity: 'error' })
 			return;
 		};
 
-		if(  result === CreateUserResult.INVALID_EMAIL ) {
-			openAlert({ message: 'Correo electrónico inválido.', severity: 'error' })
+		if(  dataForm.email === '' || dataForm.name === '' || dataForm.password === '' || dataForm.confirmPassword === '' || dataForm.roleId === '' ) {
+			openAlert({ message: 'Todos los campos son requeridos.', severity: 'error' })
 			return;
 		};
 
-		if(  result === CreateUserResult.INVALID_PASSWORD ) {
-			openAlert({ message: 'La contraseña debe tener 8 carácteres, al menos un número, una mayúscula y una minúscula.', severity: 'error' })
-			return;
-		};
+		
 
-		if(  result === CreateUserResult.USER_FOUND ) {
-			openAlert({ message: 'El usuario ya estaba registrado.', severity: 'error' })
-			return;
-		};
+		// openAlert({ message: 'Correo electrónico inválido.', severity: 'error' })
+
+		// if(  result === CreateUserResult.INVALID_PASSWORD ) {
+		// 	openAlert({ message: 'La contraseña debe tener 8 carácteres, al menos un número, una mayúscula y una minúscula.', severity: 'error' })
+		// 	return;
+		// };
+
+		// if(  result === CreateUserResult.USER_FOUND ) {
+		// 	openAlert({ message: 'El usuario ya estaba registrado.', severity: 'error' })
+		// 	return;
+		// };
+
+		if( dataForm.roleId === '1' ) result = await userEndpoints.CreateAdmin( dataForm );
+		if( dataForm.roleId === '2' ) result = await userEndpoints.CreateUser( dataForm );
 		
 		if(  result === CreateUserResult.OK ) {
 			openAlert({ message: 'Usuario registrado con éxito', severity: 'success' })
@@ -181,7 +186,7 @@ export const Users = () => {
 					<TextField size='small' label='Confirmar contraseña' variant='outlined' fullWidth type='password' name='confirmPassword' value={ dataForm.confirmPassword } onChange={ onChangeInput } />
 
 					<div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
-						<Button type='submit' size='small' variant='contained' sx={{ width: '80px' }} onClick={ handleConfirmBtnModal } >Crear</Button>
+						<Button size='small' variant='contained' sx={{ width: '80px' }} onClick={ handleConfirmBtnModal } >Crear</Button>
 					</div>
 				</form>
 			</Modal>

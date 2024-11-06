@@ -454,7 +454,7 @@ export const Projects = () => {
                   Saltar
                 </Button>
               )} */}
-              <Button type={ activeStep === steps.length - 1 ? 'submit' : 'button'} variant='contained' onClick={handleNext}>
+              <Button variant='contained' onClick={handleNext}>
                 {activeStep === steps.length - 1 ? 'Terminar' : 'Siguiente'}
               </Button>
             </Box>
